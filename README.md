@@ -1,0 +1,1 @@
+# gigigo-imageRecognition-library-android
