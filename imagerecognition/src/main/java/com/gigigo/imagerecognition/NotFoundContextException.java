@@ -1,9 +1,5 @@
 package com.gigigo.imagerecognition;
 
-/**
- * Created by Sergio Martinez Rodriguez
- * Date 6/5/16.
- */
 public class NotFoundContextException extends RuntimeException {
   public NotFoundContextException(String message) {
     super(message);

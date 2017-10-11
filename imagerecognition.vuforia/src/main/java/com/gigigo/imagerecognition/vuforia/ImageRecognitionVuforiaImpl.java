@@ -4,17 +4,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import com.gigigo.ggglib.ContextProvider;
-import com.gigigo.ggglib.permissions.AndroidPermissionCheckerImpl;
-import com.gigigo.ggglib.permissions.Permission;
-import com.gigigo.ggglib.permissions.PermissionChecker;
-import com.gigigo.ggglib.permissions.UserPermissionRequestResponseListener;
-import com.gigigo.imagerecognition.ImageRecognition;
+import android.widget.Toast;
 import com.gigigo.imagerecognition.ImageRecognitionCredentials;
 import com.gigigo.imagerecognition.NotFoundContextException;
 import com.gigigo.imagerecognition.vuforia.credentials.ParcelableIrCredentialsAdapter;
 import com.gigigo.imagerecognition.vuforia.credentials.ParcelableVuforiaCredentials;
-import com.gigigo.imagerecognition.vuforia.permissions.CameraPermissionImpl;
+import com.gigigo.permissions.PermissionsActivity;
+import com.gigigo.permissions.exception.PermissionException;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
+import kotlin.jvm.functions.Function1;
 
 /**
  * This is a suitable implementation for image recognition module, in fact this this Vuforia
@@ -23,19 +22,12 @@ import com.gigigo.imagerecognition.vuforia.permissions.CameraPermissionImpl;
  * <p/>
  * This class is already managing Camera permissions implementation.
  */
-public class ImageRecognitionVuforiaImpl
-    implements ImageRecognition, UserPermissionRequestResponseListener {
-
+public class ImageRecognitionVuforiaImpl implements ImageRecognition {
   public static final String IMAGE_RECOGNITION_CREDENTIALS = "IMAGE_RECOGNITION_CREDENTIALS";
   public static final String IMAGE_RECOGNITION_CODE_RESULT = "IMAGE_RECOGNITION_CODE_RESULT";
-  static boolean is_for_result = false;
+  private static final int PERMISSIONS_REQUEST_CAMERA = 1;
   private static ContextProvider contextProvider;
-  /********************
-   * NEW start for redder/destapp
-   ************************************/
   int mCodeForResult = -1;
-  private PermissionChecker permissionChecker;
-  private Permission cameraPermission;
   private ParcelableVuforiaCredentials credentials;
 
   public ImageRecognitionVuforiaImpl() {
@@ -64,11 +56,6 @@ activity caller vuforia is started again, for show alertDialog
 
   @Override public <T> void setContextProvider(T contextProvider) {
     this.contextProvider = (ContextProvider) contextProvider;
-    this.permissionChecker =
-        new AndroidPermissionCheckerImpl(this.contextProvider.getApplicationContext(),
-            this.contextProvider);
-
-    this.cameraPermission = new CameraPermissionImpl(this.contextProvider.getApplicationContext());
   }
 
   /**
@@ -79,39 +66,29 @@ activity caller vuforia is started again, for show alertDialog
    * @param credentials interface implementation with Vuforia keys
    */
   @Override public void startImageRecognition(ImageRecognitionCredentials credentials) {
-
-    is_for_result = false;
     checkContext();
 
     this.credentials = digestCredentials(credentials);
 
-    if (permissionChecker.isGranted(cameraPermission)) {
-      startImageRecognitionActivity();
-    } else {
-      requestPermissions();
-    }
+    PermissionsActivity.Navigator.open(this.contextProvider.getApplicationContext(),
+        new Function0<Unit>() {
+          @Override public Unit invoke() {
+            startImageRecognitionActivity();
+            return null;
+          }
+        }, new Function1<PermissionException, Unit>() {
+          @Override public Unit invoke(PermissionException e) {
+            Toast.makeText(contextProvider.getCurrentActivity(), "Explanation!!!",
+                Toast.LENGTH_SHORT).show();
+
+            return null;
+          }
+        });
   }
 
   private void checkContext() throws NotFoundContextException {
     if (contextProvider == null) {
       throw new NotFoundContextException();
-    }
-  }
-
-  @Override public void onPermissionAllowed(boolean permissionAllowed) {
-    if (permissionAllowed) {
-      if (is_for_result) {
-        startImageRecognitionForResult();
-      } else {
-        startImageRecognitionActivity();
-      }
-    }
-  }
-
-  private void requestPermissions() {
-    if (contextProvider.isActivityContextAvailable()) {
-      permissionChecker.askForPermission(cameraPermission, this,
-          contextProvider.getCurrentActivity());
     }
   }
 
@@ -122,7 +99,6 @@ activity caller vuforia is started again, for show alertDialog
         adapter.getParcelableFromCredentialsForVuforia(externalCredentials);
     return credentials;
   }
-  //necesario, ya q podemos llamar a con result y start estandar y x tanto el mCodeForResult no nos determina el contexto de ejecucion que ueremos en ese momento, el contexto nos lo deetrmina la funcion llamada, startactivity o la de on result
 
   private void startImageRecognitionActivity() {
     Intent imageRecognitionIntent =
@@ -134,45 +110,5 @@ activity caller vuforia is started again, for show alertDialog
 
     imageRecognitionIntent.putExtra(IMAGE_RECOGNITION_CREDENTIALS, b);
     contextProvider.getApplicationContext().startActivity(imageRecognitionIntent);
-  }
-
-  public void setCodeForResult(int requestCode) {
-    this.mCodeForResult = requestCode;
-  }
-
-  public void setCredentials(ImageRecognitionCredentials credentials) {
-    this.credentials = digestCredentials(credentials);
-  }
-
-  public void startImageRecognitionForResult(ImageRecognitionCredentials credentials,
-      int codeForResult) {
-    setCredentials(credentials);
-    setCodeForResult(codeForResult);
-    startImageRecognitionForResult();
-  }
-
-  private void startImageRecognitionForResult() {
-    is_for_result = true;
-    checkContext();
-
-    if (permissionChecker.isGranted(cameraPermission)) {
-      startImageRecognitionForResultIntent();
-    } else {
-      requestPermissions();
-    }
-  }
-
-  private void startImageRecognitionForResultIntent() {
-    Intent imageRecognitionIntent =
-        new Intent(contextProvider.getApplicationContext(), VuforiaActivity.class);
-    //  imageRecognitionIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-    Bundle b = new Bundle();
-    b.putParcelable(IMAGE_RECOGNITION_CREDENTIALS, credentials);
-
-    imageRecognitionIntent.putExtra(IMAGE_RECOGNITION_CREDENTIALS, b);
-    imageRecognitionIntent.putExtra(IMAGE_RECOGNITION_CODE_RESULT, mCodeForResult);
-    contextProvider.getCurrentActivity()
-        .startActivityForResult(imageRecognitionIntent, mCodeForResult);
   }
 }

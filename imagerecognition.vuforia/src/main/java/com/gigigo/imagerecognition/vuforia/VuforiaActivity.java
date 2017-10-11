@@ -1,11 +1,13 @@
 package com.gigigo.imagerecognition.vuforia;
 
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4ox.app.FragmentActivity;
+import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +16,6 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.RelativeLayout;
 
-import com.gigigo.ggglogger.GGGLogImpl;
 import com.gigigo.imagerecognition.ImageRecognitionConstants;
 import com.gigigo.vuforiacore.sdkimagerecognition.icloudrecognition.CloudRecognitionActivityLifeCycleCallBack;
 import com.gigigo.vuforiacore.sdkimagerecognition.icloudrecognition.ICloudRecognitionCommunicator;
@@ -35,7 +36,7 @@ public class VuforiaActivity extends FragmentActivity
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
-        GGGLogImpl.log("VuforiaActivity.onCreate");
+        Log.i("VuforiaActivity", "VuforiaActivity.onCreate");
         initVuforiaKeys(getIntent());
         initGetCodeForResult(getIntent());
     }
@@ -132,7 +133,7 @@ public class VuforiaActivity extends FragmentActivity
             ObjectAnimator oay = ObjectAnimator.ofFloat(scanLine, "translationY", 0, yMax);
             oay.setRepeatCount(Animation.INFINITE);
             oay.setDuration(ANIM_DURATION);
-            oay.setRepeatMode(Animation.REVERSE);
+            oay.setRepeatMode(ValueAnimator.REVERSE);
 
             oay.setInterpolator(new LinearInterpolator());
             oay.start();

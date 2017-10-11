@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.support.v7.widget.Toolbar
 import android.widget.Button
 import android.widget.TextView
-import com.gigigo.ggglib.ContextProvider
+import com.gigigo.imagerecognition.vuforia.ContextProvider
 
 class ImageRecognizerActivity : AppCompatActivity() {
 
@@ -44,8 +44,7 @@ class ImageRecognizerActivity : AppCompatActivity() {
     val toolbar = findViewById(R.id.toolbar) as Toolbar
 
     setSupportActionBar(toolbar)
-    supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    supportActionBar?.setDisplayShowHomeEnabled(true)
+    supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
     toolbar.setNavigationOnClickListener { onBackPressed() }
 
@@ -60,6 +59,12 @@ class ImageRecognizerActivity : AppCompatActivity() {
   public override fun onDestroy() {
     super.onDestroy()
     imageRecognizerActivity = null
+  }
+
+  override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
+      grantResults: IntArray) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    //TODO:
   }
 
   private val licenseKey: String = "Abi5nL//////AAAAAXzdWR6MxEppinKbZ9qJjhU7Op5/+8Pwm8tdYfI4f3zFmRweYqowENwgiOUAtaiIH06OpQFISbhX9Linf/uq5JXUADO/MFrnbzy/UIuA3whurbD+Q18bV3uRrm2FtvF64fWdH7R1GoAbOEL6wbF621Da0JJ4uVYAZEYOga/6C4fBEtf0LpKoetdNIVpIxvWsIWHRNVWX41gbRTmwSqCnoV1axtSqBAalAx5Oq/GjoD4a8isoBRJMhkIEOR+4Q7lbyJrQatD+9TqINi9wAuBY9/atNKA27AzMpnQcuAaSr2rv8Y8r3wtk7yQY7oTm8CrBMLri+TdEZoF6Z/TdZaupRaqrlKZqtptOme0zoodbOTVe"

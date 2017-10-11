@@ -1,12 +1,6 @@
 package com.gigigo.imagerecognition;
 
-/**
- * Created by Sergio Martinez Rodriguez
- * Date 29/4/16.
- */
 public interface ImageRecognition {
-
-
 
   /**
    * You MUST Call this method before calling startImageRecognition in order to provide a valid
@@ -23,10 +17,8 @@ public interface ImageRecognition {
    * were not granted User will be notified. If credentials are not valid you'll have an error log
    * message.
    *
-   * @Throws NotFoundContextException is context has not been provided before
-   *
    * @param imageRecognitionCredentials interface implementation with Vuforia keys
-   *
+   * @Throws NotFoundContextException is context has not been provided before
    */
   void startImageRecognition(ImageRecognitionCredentials imageRecognitionCredentials);
 }
