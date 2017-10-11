@@ -1,6 +1,8 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
+group = 'com.github.Gigigo-Android-Devs'
+
 android {
   compileSdkVersion rootProject.ext.androidCompileSdkVersion
   buildToolsVersion rootProject.ext.androidBuildToolsVersion

@@ -61,6 +61,34 @@ ext {
     return versionName
   };
 
+  getVersionName = { version ->
+    println("version: " + version)
+    def major, minor, patch
+
+    if(version["major"] == null) {
+      major = 0
+    }
+    else {
+      major = version["major"]
+    }
+
+    if(version["minor"] == null) {
+      minor = 0
+    }
+    else {
+      minor = version["minor"]
+    }
+
+    if(version["patch"] == null) {
+      patch = "0-beta"
+    }
+    else {
+      patch = version["patch"]
+    }
+
+    return generateVersionName(major, minor, patch)
+  };
+
   getVariantFieldValue = { field, buildType ->
     def value
 

@@ -1,4 +1,7 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+
+group = 'com.github.Gigigo-Android-Devs'
 
 android {
   compileSdkVersion rootProject.ext.androidCompileSdkVersion
@@ -8,7 +11,7 @@ android {
     minSdkVersion 10 //rootProject.ext.androidMinSdkVersion
     targetSdkVersion rootProject.ext.androidTargetSdkVersion
     versionCode generateAutoVersionCode()
-    versionName generateVersionName(1,0,0)
+    versionName getVersionName(rootProject.ext.versionName)
   }
   buildTypes {
     release {
