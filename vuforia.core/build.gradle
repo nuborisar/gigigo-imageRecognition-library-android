@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
 
 android {
   compileSdkVersion rootProject.ext.androidCompileSdkVersion
@@ -8,8 +7,8 @@ android {
   defaultConfig {
     minSdkVersion 10 //rootProject.ext.androidMinSdkVersion
     targetSdkVersion rootProject.ext.androidTargetSdkVersion
-    versionCode 1
-    versionName "1.0"
+    versionCode generateAutoVersionCode()
+    versionName generateVersionName(1,0,0)
   }
   buildTypes {
     release {

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.widget.Toast;
+import com.gigigo.imagerecognition.ImageRecognition;
 import com.gigigo.imagerecognition.ImageRecognitionCredentials;
 import com.gigigo.imagerecognition.NotFoundContextException;
 import com.gigigo.imagerecognition.vuforia.credentials.ParcelableIrCredentialsAdapter;
@@ -23,11 +24,11 @@ import kotlin.jvm.functions.Function1;
  * This class is already managing Camera permissions implementation.
  */
 public class ImageRecognitionVuforiaImpl implements ImageRecognition {
+
   public static final String IMAGE_RECOGNITION_CREDENTIALS = "IMAGE_RECOGNITION_CREDENTIALS";
   public static final String IMAGE_RECOGNITION_CODE_RESULT = "IMAGE_RECOGNITION_CODE_RESULT";
   private static final int PERMISSIONS_REQUEST_CAMERA = 1;
   private static ContextProvider contextProvider;
-  int mCodeForResult = -1;
   private ParcelableVuforiaCredentials credentials;
 
   public ImageRecognitionVuforiaImpl() {
