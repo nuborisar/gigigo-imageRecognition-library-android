@@ -19,12 +19,6 @@
         <category android:name="android.intent.category.LAUNCHER"/>
       </intent-filter>
     </activity>
-
-    <receiver android:name=".ImageRecognizerReceiver">
-      <intent-filter>
-        <action android:name="com.gigigo.imagerecognition.intent.action.RECOGNIZED_IMAGE"/>
-      </intent-filter>
-    </receiver>
   </application>
 
 </manifest>

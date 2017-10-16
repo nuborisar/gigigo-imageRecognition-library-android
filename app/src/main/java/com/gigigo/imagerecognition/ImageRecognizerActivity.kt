@@ -56,28 +56,18 @@ class ImageRecognizerActivity : AppCompatActivity() {
     title = getString(R.string.imagerecognizer_title)
   }
 
-  public override fun onResume() {
-    super.onResume()
-    imageRecognizerActivity = this
-  }
-
-  public override fun onDestroy() {
-    super.onDestroy()
-    imageRecognizerActivity = null
-  }
-
   private fun showResponseCode(code: String) {
     codeTv.text = "CODE= $code"
   }
 
   private fun startVuforia() {
-    val vuforiaCredentials = object : Credentials {
-      override fun getLicensekey(): String = this@ImageRecognizerActivity.licenseKey
-      override fun getClientAccessKey(): String = this@ImageRecognizerActivity.clientAccessKey
-      override fun getClientSecretKey(): String = this@ImageRecognizerActivity.clientSecretKey
+    var imageRecognition = ImageRecognitionVuforia()
+
+    ImageRecognitionVuforia.onRecognizedPattern {
+      showResponseCode(it)
     }
 
-    var imageRecognition = ImageRecognitionVuforia()
+
 
     val contextProvider = object : ContextProvider {
       override fun getCurrentActivity(): Activity = this@ImageRecognizerActivity
@@ -85,17 +75,13 @@ class ImageRecognizerActivity : AppCompatActivity() {
       override fun getApplicationContext(): Context = this@ImageRecognizerActivity.application.applicationContext
       override fun isApplicationContextAvailable(): Boolean = true
     }
-
     imageRecognition.setContextProvider(contextProvider)
 
-    imageRecognition.startImageRecognition(vuforiaCredentials)
-  }
-
-  companion object Navigator {
-    private var imageRecognizerActivity: ImageRecognizerActivity? = null
-
-    fun showCode(code: String) {
-      imageRecognizerActivity?.showResponseCode(code)
+    val vuforiaCredentials = object : Credentials {
+      override fun getLicensekey(): String = this@ImageRecognizerActivity.licenseKey
+      override fun getClientAccessKey(): String = this@ImageRecognizerActivity.clientAccessKey
+      override fun getClientSecretKey(): String = this@ImageRecognizerActivity.clientSecretKey
     }
+    imageRecognition.startImageRecognition(vuforiaCredentials)
   }
 }

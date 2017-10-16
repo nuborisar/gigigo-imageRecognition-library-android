@@ -1,6 +1,6 @@
 package com.gigigo.imagerecognition;
 
-public interface ImageRecognition {
+public interface ImageRecognition<T> {
 
   /**
    * You MUST Call this method before calling startImageRecognition in order to provide a valid
@@ -8,9 +8,8 @@ public interface ImageRecognition {
    * Context provider Implementation from GGG lib because current activity context is required
    *
    * @param contextProvider Context Provider
-   * @param <T> ContextProvider from Gigigo Lib is accepted
    */
-  <T> void setContextProvider(T contextProvider);
+  void setContextProvider(T contextProvider);
 
   /**
    * Checks permissions and starts Image recognitio activity using given credentials. If Permissions

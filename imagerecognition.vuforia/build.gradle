@@ -37,6 +37,9 @@ android {
 dependencies {
   compile rootProject.ext.libraries.supportAppCompatV7
 
+  compile rootProject.ext.libraries.kotlinStdLib
+
+
   compile rootProject.ext.modules.vuforiaCore
   compile rootProject.ext.modules.imageRecognition
   compile rootProject.ext.modules.permissions

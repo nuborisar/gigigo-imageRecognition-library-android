@@ -46,7 +46,7 @@ public class VuforiaActivity extends FragmentActivity implements ICloudRecogniti
 
   private void initGetCodeForResult(Intent intent) {
     int codeResultAux =
-        intent.getIntExtra(ImageRecognitionVuforia.IMAGE_RECOGNITION_CODE_RESULT, -1);
+        intent.getIntExtra(Constants.IMAGE_RECOGNITION_CODE_RESULT, -1);
     if (codeResultAux != -1) {
       this.mCodeResult = codeResultAux;
     }
@@ -54,28 +54,14 @@ public class VuforiaActivity extends FragmentActivity implements ICloudRecogniti
 
   //region implements CloudRecoCommunicator ands initializations calls
   private void initVuforiaKeys(Intent intent) {
-    Bundle b = intent.getBundleExtra(ImageRecognitionVuforia.IMAGE_RECOGNITION_CREDENTIALS);
+    Bundle b = intent.getBundleExtra(
+        Constants.IMAGE_RECOGNITION_CREDENTIALS);
     VuforiaCredentials vuforiaCredentials =
-        b.getParcelable(ImageRecognitionVuforia.IMAGE_RECOGNITION_CREDENTIALS);
+        b.getParcelable(Constants.IMAGE_RECOGNITION_CREDENTIALS);
 
     mCloudRecoCallBack = new CloudRecognitionActivityLifeCycleCallBack(this, this,
         vuforiaCredentials.getClientAccessKey(), vuforiaCredentials.getClientSecretKey(),
         vuforiaCredentials.getLicenseKey(), false);
-  }
-
-  /**
-   * @Deprecated
-   */
-  @Deprecated private void setThemeColorScheme() {
-    //not vuforia6
-       /* if (this.mCloudRecoCallBack != null) {
-            try {
-                this.mCloudRecoCallBack.setUIPointColor(ContextCompat.getColor(this, R.color.ir_scan_point_color));
-                this.mCloudRecoCallBack.setUIScanLineColor(ContextCompat.getColor(this, R.color.ir_scan_line_color));
-            } catch (IllegalArgumentException e) {
-                GGGLogImpl.log(e.getMessage(), LogLevel.ERROR);
-            }
-        }*/
   }
 
   @Override public void setContentViewTop(View vuforiaView) {
@@ -109,7 +95,6 @@ public class VuforiaActivity extends FragmentActivity implements ICloudRecogniti
     });
     //endregion
     mVuforiaView = vuforiaView;
-    setThemeColorScheme();
 
     startBoringAnimation();
     scanlineStart();
@@ -174,7 +159,7 @@ public class VuforiaActivity extends FragmentActivity implements ICloudRecogniti
       //we add package appid,
       String appId = getApplicationContext().getPackageName();
       i.putExtra(appId, appId);
-      ImageRecognitionVuforia.sendRecognizedPattern(i);
+      ImageRecognitionVuforia.Companion.sendRecognizedPattern(i);
       finish();
     }
   }
