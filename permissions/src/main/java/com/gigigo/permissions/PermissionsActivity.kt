@@ -40,7 +40,7 @@ class PermissionsActivity : AppCompatActivity() {
         var permissionException = PermissionException(Error.PERMISSION_RATIONALE_ERROR, "Should show request permission rationale")
 
         Snackbar.make(window.decorView.rootView, permissionException.error,
-            Snackbar.LENGTH_INDEFINITE)
+            Snackbar.LENGTH_LONG)
             .setAction("retry", { doRequestPermission() }).show()
 
         //finishWithoutPermissions(permissionException)
