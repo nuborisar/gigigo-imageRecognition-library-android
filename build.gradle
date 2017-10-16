@@ -21,7 +21,7 @@ allprojects {
     androidMinSdkVersion = 16
     androidTargetSdkVersion = 25
     androidCompileSdkVersion = 25
-    versionName = [major: 1, minor: 0, patch: 3]
+    versionName = [major: 1, minor: 0, patch: 4]
   }
 
   repositories {
