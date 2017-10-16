@@ -2,14 +2,19 @@ package com.gigigo.imagerecognition
 
 import android.app.Activity
 import android.content.Context
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.widget.Button
 import android.widget.TextView
 import com.gigigo.imagerecognition.vuforia.ContextProvider
+import com.gigigo.imagerecognition.vuforia.ImageRecognitionVuforia
 
 class ImageRecognizerActivity : AppCompatActivity() {
+
+  private val licenseKey: String = "Abi5nL//////AAAAAXzdWR6MxEppinKbZ9qJjhU7Op5/+8Pwm8tdYfI4f3zFmRweYqowENwgiOUAtaiIH06OpQFISbhX9Linf/uq5JXUADO/MFrnbzy/UIuA3whurbD+Q18bV3uRrm2FtvF64fWdH7R1GoAbOEL6wbF621Da0JJ4uVYAZEYOga/6C4fBEtf0LpKoetdNIVpIxvWsIWHRNVWX41gbRTmwSqCnoV1axtSqBAalAx5Oq/GjoD4a8isoBRJMhkIEOR+4Q7lbyJrQatD+9TqINi9wAuBY9/atNKA27AzMpnQcuAaSr2rv8Y8r3wtk7yQY7oTm8CrBMLri+TdEZoF6Z/TdZaupRaqrlKZqtptOme0zoodbOTVe"
+  private val clientAccessKey: String = "fe4d316136ea6b7ee5faa72c4884e33805128b08"
+  private val clientSecretKey: String = "670f15bb4cd34c1621a892ced5321896c0b70df6"
 
   private lateinit var licenseKeyTv: TextView
   private lateinit var accessKeyTv: TextView
@@ -61,45 +66,27 @@ class ImageRecognizerActivity : AppCompatActivity() {
     imageRecognizerActivity = null
   }
 
-  override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
-      grantResults: IntArray) {
-    super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    //TODO:
-  }
-
-  private val licenseKey: String = "Abi5nL//////AAAAAXzdWR6MxEppinKbZ9qJjhU7Op5/+8Pwm8tdYfI4f3zFmRweYqowENwgiOUAtaiIH06OpQFISbhX9Linf/uq5JXUADO/MFrnbzy/UIuA3whurbD+Q18bV3uRrm2FtvF64fWdH7R1GoAbOEL6wbF621Da0JJ4uVYAZEYOga/6C4fBEtf0LpKoetdNIVpIxvWsIWHRNVWX41gbRTmwSqCnoV1axtSqBAalAx5Oq/GjoD4a8isoBRJMhkIEOR+4Q7lbyJrQatD+9TqINi9wAuBY9/atNKA27AzMpnQcuAaSr2rv8Y8r3wtk7yQY7oTm8CrBMLri+TdEZoF6Z/TdZaupRaqrlKZqtptOme0zoodbOTVe"
-
-  private val clientAccessKey: String = "fe4d316136ea6b7ee5faa72c4884e33805128b08"
-
-  private val clientSecretKey: String = "670f15bb4cd34c1621a892ced5321896c0b70df6"
-
   private fun showResponseCode(code: String) {
     codeTv.text = "CODE= $code"
-
   }
 
   private fun startVuforia() {
-    var imageRecognition = com.gigigo.imagerecognition.vuforia.ImageRecognitionVuforiaImpl()
+    val vuforiaCredentials = object : Credentials {
+      override fun getLicensekey(): String = this@ImageRecognizerActivity.licenseKey
+      override fun getClientAccessKey(): String = this@ImageRecognizerActivity.clientAccessKey
+      override fun getClientSecretKey(): String = this@ImageRecognizerActivity.clientSecretKey
+    }
+
+    var imageRecognition = ImageRecognitionVuforia()
 
     val contextProvider = object : ContextProvider {
-      override fun getApplicationContext(): Context = this@ImageRecognizerActivity.application.applicationContext
-
       override fun getCurrentActivity(): Activity = this@ImageRecognizerActivity
-
-      override fun isApplicationContextAvailable(): Boolean = true
-
       override fun isActivityContextAvailable(): Boolean = true
+      override fun getApplicationContext(): Context = this@ImageRecognizerActivity.application.applicationContext
+      override fun isApplicationContextAvailable(): Boolean = true
     }
 
     imageRecognition.setContextProvider(contextProvider)
-
-    val vuforiaCredentials = object : ImageRecognitionCredentials{
-      override fun getLicensekey(): String = this@ImageRecognizerActivity.licenseKey
-
-      override fun getClientSecretKey(): String = this@ImageRecognizerActivity.clientSecretKey
-
-      override fun getClientAccessKey(): String = this@ImageRecognizerActivity.clientAccessKey
-    }
 
     imageRecognition.startImageRecognition(vuforiaCredentials)
   }

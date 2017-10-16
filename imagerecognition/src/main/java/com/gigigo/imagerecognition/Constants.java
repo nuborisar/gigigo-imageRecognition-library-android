@@ -1,6 +1,6 @@
 package com.gigigo.imagerecognition;
 
-public class ImageRecognitionConstants {
+public class Constants {
 
   public static final String PATTERN_ID = "VUFORIA_PATTERN_ID";//string
   public static final String PATTERN_NAME = "VUFORIA_PATTERN_NAME";//string

@@ -5,11 +5,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.widget.Toast;
+import com.gigigo.imagerecognition.Credentials;
 import com.gigigo.imagerecognition.ImageRecognition;
-import com.gigigo.imagerecognition.ImageRecognitionCredentials;
 import com.gigigo.imagerecognition.NotFoundContextException;
-import com.gigigo.imagerecognition.vuforia.credentials.ParcelableIrCredentialsAdapter;
-import com.gigigo.imagerecognition.vuforia.credentials.ParcelableVuforiaCredentials;
+import com.gigigo.imagerecognition.vuforia.credentials.VuforiaCredentials;
 import com.gigigo.permissions.PermissionsActivity;
 import com.gigigo.permissions.exception.PermissionException;
 import kotlin.Unit;
@@ -23,15 +22,14 @@ import kotlin.jvm.functions.Function1;
  * <p/>
  * This class is already managing Camera permissions implementation.
  */
-public class ImageRecognitionVuforiaImpl implements ImageRecognition {
+public class ImageRecognitionVuforia implements ImageRecognition {
 
   public static final String IMAGE_RECOGNITION_CREDENTIALS = "IMAGE_RECOGNITION_CREDENTIALS";
   public static final String IMAGE_RECOGNITION_CODE_RESULT = "IMAGE_RECOGNITION_CODE_RESULT";
-  private static final int PERMISSIONS_REQUEST_CAMERA = 1;
   private static ContextProvider contextProvider;
-  private ParcelableVuforiaCredentials credentials;
+  private VuforiaCredentials credentials;
 
-  public ImageRecognitionVuforiaImpl() {
+  public ImageRecognitionVuforia() {
 
   }
 
@@ -66,7 +64,7 @@ activity caller vuforia is started again, for show alertDialog
    *
    * @param credentials interface implementation with Vuforia keys
    */
-  @Override public void startImageRecognition(ImageRecognitionCredentials credentials) {
+  @Override public void startImageRecognition(Credentials credentials) {
     checkContext();
 
     this.credentials = digestCredentials(credentials);
@@ -93,12 +91,9 @@ activity caller vuforia is started again, for show alertDialog
     }
   }
 
-  private ParcelableVuforiaCredentials digestCredentials(
-      ImageRecognitionCredentials externalCredentials) {
-    ParcelableIrCredentialsAdapter adapter = new ParcelableIrCredentialsAdapter();
-    ParcelableVuforiaCredentials credentials =
-        adapter.getParcelableFromCredentialsForVuforia(externalCredentials);
-    return credentials;
+  private VuforiaCredentials digestCredentials(Credentials credentials) {
+    return new VuforiaCredentials(credentials.getLicensekey(), credentials.getClientAccessKey(),
+        credentials.getClientSecretKey());
   }
 
   private void startImageRecognitionActivity() {

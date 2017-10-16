@@ -23,7 +23,6 @@ android {
 }
 
 dependencies {
-  compile fileTree(dir: 'libs', include: ['*.jar'])
   compile rootProject.ext.libraries.kotlinStdLib
 
   compile rootProject.ext.libraries.supportAppCompatV7

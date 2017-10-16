@@ -1,6 +1,6 @@
 package com.gigigo.imagerecognition;
 
-public interface ImageRecognitionCredentials {
+public interface Credentials {
 
   String getClientAccessKey();
 

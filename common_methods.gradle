@@ -62,28 +62,20 @@ ext {
   };
 
   getVersionName = { version ->
-    println("version: " + version)
-    def major, minor, patch
+    def major = version["major"]
+    def minor = version["minor"]
+    def patch = version["patch"]
 
-    if(version["major"] == null) {
+    if(major == null) {
       major = 0
     }
-    else {
-      major = version["major"]
-    }
 
-    if(version["minor"] == null) {
+    if(minor == null) {
       minor = 0
     }
-    else {
-      minor = version["minor"]
-    }
 
-    if(version["patch"] == null) {
+    if(patch == null) {
       patch = "0-beta"
-    }
-    else {
-      patch = version["patch"]
     }
 
     return generateVersionName(major, minor, patch)

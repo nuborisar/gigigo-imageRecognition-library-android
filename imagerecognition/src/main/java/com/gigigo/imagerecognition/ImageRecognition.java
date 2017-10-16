@@ -17,8 +17,8 @@ public interface ImageRecognition {
    * were not granted User will be notified. If credentials are not valid you'll have an error log
    * message.
    *
-   * @param imageRecognitionCredentials interface implementation with Vuforia keys
+   * @param credentials interface implementation with Vuforia keys
    * @Throws NotFoundContextException is context has not been provided before
    */
-  void startImageRecognition(ImageRecognitionCredentials imageRecognitionCredentials);
+  void startImageRecognition(Credentials credentials);
 }
