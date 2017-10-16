@@ -2,13 +2,15 @@ package com.gigigo.imagerecognition.vuforia
 
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.Snackbar
+import android.view.View
 import android.widget.Toast
 import com.gigigo.imagerecognition.Constants
 import com.gigigo.imagerecognition.Credentials
 import com.gigigo.imagerecognition.ImageRecognition
 import com.gigigo.imagerecognition.vuforia.credentials.VuforiaCredentials
 import com.gigigo.permissions.PermissionsActivity
-import kotlin.properties.Delegates
+import com.gigigo.permissions.exception.Error as PermissionError
 
 /**
  * This is a suitable implementation for image recognition module, in fact this this Vuforia
@@ -36,13 +38,21 @@ class ImageRecognitionVuforia : ImageRecognition<ContextProvider> {
     credentials = digestCredentials(vuforiaCredentials)
 
     PermissionsActivity.open(contextProvider.getApplicationContext(),
-        {
+        onSuccess = {
           startImageRecognitionActivity()
-        }) {
-      //TODO: retry request permission
-      Toast.makeText(contextProvider?.getCurrentActivity(), "Explanation!!!",
-          Toast.LENGTH_SHORT).show()
-    }
+        },
+        onError = { permissionException ->
+          when(permissionException.code) {
+            PermissionError.PERMISSION_ERROR -> {
+              Toast.makeText(contextProvider.getCurrentActivity(), permissionException.error,
+                  Toast.LENGTH_SHORT).show()
+            }
+            else -> {
+
+            }
+          }
+        }
+    )
   }
 
   private fun digestCredentials(credentials: Credentials): VuforiaCredentials = VuforiaCredentials(
@@ -75,7 +85,7 @@ class ImageRecognitionVuforia : ImageRecognition<ContextProvider> {
 
         var code: String = intent.getStringExtra(Constants.PATTERN_ID)
 
-        if(code.isNotBlank()) {
+        if (code.isNotBlank()) {
           recognizedCallback(code)
         }
       }

@@ -5,9 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import com.gigigo.permissions.exception.Error
 import com.gigigo.permissions.exception.PermissionException
 
@@ -35,13 +37,23 @@ class PermissionsActivity : AppCompatActivity() {
 
       if (ActivityCompat.shouldShowRequestPermissionRationale(this,
           Manifest.permission.CAMERA)) {
-        finishWithoutPermissions(
-            PermissionException(Error.PERMISSION_RATIONALE_ERROR, "Should show request permission rationale"))
+        var permissionException = PermissionException(Error.PERMISSION_RATIONALE_ERROR, "Should show request permission rationale")
+
+        Snackbar.make(window.decorView.rootView, permissionException.error,
+            Snackbar.LENGTH_INDEFINITE)
+            .setAction("retry", { doRequestPermission() }).show()
+
+        //finishWithoutPermissions(permissionException)
       } else {
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA),
-            PERMISSIONS_REQUEST_CAMERA)
+        doRequestPermission()
       }
     }
+  }
+
+  private fun doRequestPermission() {
+    ActivityCompat.requestPermissions(this,
+        arrayOf(Manifest.permission.CAMERA),
+        PERMISSIONS_REQUEST_CAMERA)
   }
 
   override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
@@ -53,7 +65,8 @@ class PermissionsActivity : AppCompatActivity() {
           finishWithPermissionsGranted()
         } else {
           finishWithoutPermissions(
-              PermissionException(Error.PERMISSION_ERROR, "Location permission is mandatory"))
+              PermissionException(Error.PERMISSION_ERROR,
+                  "Permission denied, boo! Disable the functionality that depends on this permission."))
         }
       }
     }
@@ -74,7 +87,8 @@ class PermissionsActivity : AppCompatActivity() {
     var onSuccess: () -> Unit = {}
     var onError: (PermissionException) -> Unit = {}
 
-    fun open(context: Context, onSuccess: () -> Unit = {}, onError: (PermissionException) -> Unit = {}) {
+    fun open(context: Context, onSuccess: () -> Unit = {},
+        onError: (PermissionException) -> Unit = {}) {
 
       this.onSuccess = onSuccess
       this.onError = onError

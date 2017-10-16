@@ -41,7 +41,6 @@ dependencies {
   compile rootProject.ext.libraries.kotlinStdLib
 
   compile rootProject.ext.libraries.supportAppCompatV7
-  compile 'com.android.support:design:25.3.1'
 
   compile rootProject.ext.modules.imageRecognitionVuforia
 
