@@ -62,7 +62,8 @@ class ImageRecognizerActivity : AppCompatActivity(), VuforiaView.ResultHandler {
       override fun isApplicationContextAvailable(): Boolean = true
     }
     credentials = VuforiaCredentials(getLicenseKey(), getClientAccessKey(), getClientSecretKey())
-    vuforiaView = VuforiaView(this, contextProvider, credentials)
+    var contentView = findViewById(R.id.content_frame)
+    vuforiaView = VuforiaView(this, contentView, contextProvider, credentials)
   }
 
   private fun startImageRecognition() {

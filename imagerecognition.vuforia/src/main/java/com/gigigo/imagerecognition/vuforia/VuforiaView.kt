@@ -25,6 +25,7 @@ class VuforiaView : FrameLayout, ICloudRecognitionCommunicator {
   private lateinit var currentActivity: AppCompatActivity
 
   private var viewContext: Context
+  private var vuforiaContentView: ViewGroup
   private var scanLine: View? = null
   private lateinit var markFakeFeaturePoint: MarkFakeFeaturePoint
   private val scanAnimation: TranslateAnimation? = null
@@ -33,9 +34,10 @@ class VuforiaView : FrameLayout, ICloudRecognitionCommunicator {
   private lateinit var cloudRecognitionCallBack: CloudRecognitionActivityLifeCycleCallBack
 
 
-  constructor(context: Context, contextProvider: ContextProvider,
+  constructor(context: Context, contentView: View, contextProvider: ContextProvider,
       vuforiaCredentials: VuforiaCredentials) : super(context) {
     viewContext = context
+    vuforiaContentView = contentView as ViewGroup
     setupVuforiaCredentials(vuforiaCredentials, contextProvider)
   }
 
@@ -60,7 +62,7 @@ class VuforiaView : FrameLayout, ICloudRecognitionCommunicator {
     val vlp = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.MATCH_PARENT)
 
-    currentActivity.addContentView(view, vlp)
+    vuforiaContentView.addView(view, vlp)
 
     startBoringAnimation()
     scanlineStart()
