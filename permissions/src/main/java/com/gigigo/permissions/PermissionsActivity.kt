@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.support.design.widget.BaseTransientBottomBar
 import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -47,11 +48,17 @@ class PermissionsActivity : AppCompatActivity() {
 
         Snackbar.make(window.decorView.rootView, permissionException.error,
             Snackbar.LENGTH_LONG)
+            .addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+              override fun onDismissed(transientBottomBar: Snackbar, event: Int) {
+                super.onDismissed(transientBottomBar, event);
+                finish();
+              }
+            })
             .setAction(resources.getString(R.string.camera_rationale_permission_button_text),
                 { doRequestPermission() }).show()
         //todo check this for callback in app, in this case never finish activity and need another retry method like .open for check again permission from integration app
         // finishWithoutPermissions(permissionException)
-        finish();
+
       } else {
         doRequestPermission()
       }
