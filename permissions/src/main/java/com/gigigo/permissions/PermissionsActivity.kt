@@ -51,6 +51,7 @@ class PermissionsActivity : AppCompatActivity() {
                 { doRequestPermission() }).show()
         //todo check this for callback in app, in this case never finish activity and need another retry method like .open for check again permission from integration app
         // finishWithoutPermissions(permissionException)
+        finish();
       } else {
         doRequestPermission()
       }
