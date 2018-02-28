@@ -75,7 +75,7 @@ public class CloudRecognition implements ApplicationControl {
   private GestureDetector mGestureDetector;
   private LoadingDialogHandler loadingDialogHandler;
   private double mLastErrorTime;
-  private Activity mActivity;
+  public Activity mActivity;
   private ICloudRecognitionCommunicator mCommunicator;
   // declare scan line and its animation
   private View scanLine;

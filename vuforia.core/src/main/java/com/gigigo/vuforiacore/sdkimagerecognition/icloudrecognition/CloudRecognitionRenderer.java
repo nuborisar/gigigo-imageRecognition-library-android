@@ -5,8 +5,13 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import com.gigigo.vuforiacore.sdkimagerecognition.vuforiaenvironment.VuforiaSession;
 import com.gigigo.vuforiacore.sdkimagerecognition.vuforiaenvironment.utils.CubeShaders;
+import com.gigigo.vuforiacore.sdkimagerecognition.vuforiaenvironment.utils.SampleAppRenderer;
+import com.gigigo.vuforiacore.sdkimagerecognition.vuforiaenvironment.utils.SampleAppRendererControl;
+import com.gigigo.vuforiacore.sdkimagerecognition.vuforiaenvironment.utils.SampleUtils;
+import com.gigigo.vuforiacore.sdkimagerecognition.vuforiaenvironment.utils.Teapot;
 import com.gigigo.vuforiacore.sdkimagerecognition.vuforiaenvironment.utils.Texture;
 import com.gigigo.vuforiacore.sdkimagerecognition.vuforiaenvironment.utils.VuforiaUtils;
+import com.vuforia.Device;
 import com.vuforia.Matrix44F;
 import com.vuforia.Renderer;
 import com.vuforia.State;
@@ -18,9 +23,11 @@ import java.util.Vector;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-public class CloudRecognitionRenderer implements GLSurfaceView.Renderer {
-  private static final float OBJECT_SCALE_FLOAT = 3.0f;
+public class CloudRecognitionRenderer implements GLSurfaceView.Renderer, SampleAppRendererControl {
+  private static final float OBJECT_SCALE_FLOAT = 3.0f;//0.003f
   VuforiaSession vuforiaAppSession;
+
+  private SampleAppRenderer mSampleAppRenderer;
   private int shaderProgramID;
   private int vertexHandle;
   private int normalHandle;
@@ -31,31 +38,46 @@ public class CloudRecognitionRenderer implements GLSurfaceView.Renderer {
   private Vector<Texture> mTextures;
   private CloudRecognition mCloudReco;
 
-  public CloudRecognitionRenderer(VuforiaSession session, CloudRecognition activity) {
+  private boolean mIsActive = false;
+
+  public CloudRecognitionRenderer(VuforiaSession session, CloudRecognition cloudRecog) {
     vuforiaAppSession = session;
-    mCloudReco = activity;
+    mCloudReco = cloudRecog;
+    // SampleAppRenderer used to encapsulate the use of RenderingPrimitives setting
+    // the device mode AR/VR and stereo mode
+    mSampleAppRenderer =
+        new SampleAppRenderer(this, cloudRecog.mActivity, Device.MODE.MODE_AR, false, 0.010f, 5f);
   }
 
   // Called when the surface is created or recreated.
   @Override public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-    // Call function to initialize rendering:
-    initRendering();
 
     // Call Vuforia function to (re)initialize rendering after first use
     // or after OpenGL ES context was lost (e.g. after onPause/onResume):
     vuforiaAppSession.onSurfaceCreated();
+    mSampleAppRenderer.onSurfaceCreated();
   }
 
   // Called when the surface changed size.
   @Override public void onSurfaceChanged(GL10 gl, int width, int height) {
     // Call Vuforia function to handle render surface size changes:
     vuforiaAppSession.onSurfaceChanged(width, height);
+    mSampleAppRenderer.onConfigurationChanged(mIsActive);
+
+    // Call function to initialize rendering:
+    initRendering();
   }
 
   // Called to draw the current frame.
   @Override public void onDrawFrame(GL10 gl) {
     // Call our function to render content
-    renderFrame();
+    mSampleAppRenderer.render();
+  }
+
+  public void setActive(boolean active) {
+    mIsActive = active;
+
+    if (mIsActive) mSampleAppRenderer.configureVideoBackground();
   }
 
   // Function for initializing the renderer.
@@ -83,10 +105,13 @@ public class CloudRecognitionRenderer implements GLSurfaceView.Renderer {
     textureCoordHandle = GLES20.glGetAttribLocation(shaderProgramID, "vertexTexCoord");
     mvpMatrixHandle = GLES20.glGetUniformLocation(shaderProgramID, "modelViewProjectionMatrix");
     texSampler2DHandle = GLES20.glGetUniformLocation(shaderProgramID, "texSampler2D");
+
+    mTeapot = new Teapot();
   }
 
   // The render function.
-  private void renderFrame() {
+  @Deprecated private void renderFrame() {
+    //region render frame old
     // Clear color and depth buffer
     GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
@@ -95,8 +120,8 @@ public class CloudRecognitionRenderer implements GLSurfaceView.Renderer {
     State state = Renderer.getInstance().begin();
 
     // Explicitly render the Video Background
-    Renderer.getInstance().drawVideoBackground();
-
+    // Renderer.getInstance().drawVideoBackground();
+    //mSampleAppRenderer.renderVideoBackground();
     GLES20.glEnable(GLES20.GL_DEPTH_TEST);
     GLES20.glEnable(GLES20.GL_CULL_FACE);
     if (Renderer.getInstance().getVideoBackgroundConfig().getReflection()
@@ -157,9 +182,39 @@ public class CloudRecognitionRenderer implements GLSurfaceView.Renderer {
     GLES20.glDisable(GLES20.GL_DEPTH_TEST);
 
     Renderer.getInstance().end();
+    //endregion
+    //region new code
+   /* // Renders video background replacing Renderer.DrawVideoBackground()
+    mSampleAppRenderer.renderVideoBackground();
+
+    GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+    GLES20.glEnable(GLES20.GL_CULL_FACE);
+
+    // Did we find any trackables this frame?
+    if (state.getNumTrackableResults() > 0) {
+      // Gets current trackable result
+      TrackableResult trackableResult = state.getTrackableResult(0);
+
+      if (trackableResult == null) {
+        return;
+      }
+
+      mActivity.stopFinderIfStarted();
+
+      // Renders the Augmentation View with the 3D Book data Panel
+      renderAugmentation(trackableResult, projectionMatrix);
+    } else {
+      mActivity.startFinderIfStopped();
+    }
+
+    GLES20.glDisable(GLES20.GL_DEPTH_TEST);
+
+    Renderer.getInstance().end();
+  */
+    //endregion
   }
 
-  private void renderAugmentation(TrackableResult trackableResult) {
+  @Deprecated private void renderAugmentation(TrackableResult trackableResult) {
     Matrix44F modelViewMatrix_Vuforia = Tool.convertPose2GLMatrix(trackableResult.getPose());
     float[] modelViewMatrix = modelViewMatrix_Vuforia.getData();
 
@@ -198,5 +253,76 @@ public class CloudRecognitionRenderer implements GLSurfaceView.Renderer {
 
   public void setTextures(Vector<Texture> textures) {
     mTextures = textures;
+  }
+
+  @Override public void renderFrame(State state, float[] projectionMatrix) {
+    // Renders video background replacing Renderer.DrawVideoBackground()
+    mSampleAppRenderer.renderVideoBackground();
+
+    GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+    GLES20.glEnable(GLES20.GL_CULL_FACE);
+
+    // Did we find any trackables this frame?
+    if (state.getNumTrackableResults() > 0) {
+      // Gets current trackable result
+      TrackableResult trackableResult = state.getTrackableResult(0);
+
+      if (trackableResult == null) {
+        return;
+      }
+
+      mCloudReco.stopFinderIfStarted();
+
+      // Renders the Augmentation View with the 3D Book data Panel
+      renderAugmentation(trackableResult, projectionMatrix);
+    } else {
+      mCloudReco.startFinderIfStopped();
+    }
+
+    GLES20.glDisable(GLES20.GL_DEPTH_TEST);
+
+    Renderer.getInstance().end();
+  }
+
+  private Teapot mTeapot;
+
+  private void renderAugmentation(TrackableResult trackableResult, float[] projectionMatrix) {
+    Matrix44F modelViewMatrix_Vuforia = Tool.convertPose2GLMatrix(trackableResult.getPose());
+    float[] modelViewMatrix = modelViewMatrix_Vuforia.getData();
+
+    int textureIndex = 0;
+
+    // deal with the modelview and projection matrices
+    float[] modelViewProjection = new float[16];
+    Matrix.translateM(modelViewMatrix, 0, 0.0f, 0.0f, OBJECT_SCALE_FLOAT);
+    Matrix.scaleM(modelViewMatrix, 0, OBJECT_SCALE_FLOAT, OBJECT_SCALE_FLOAT, OBJECT_SCALE_FLOAT);
+    Matrix.multiplyMM(modelViewProjection, 0, projectionMatrix, 0, modelViewMatrix, 0);
+
+    // activate the shader program and bind the vertex/normal/tex coords
+    GLES20.glUseProgram(shaderProgramID);
+    GLES20.glVertexAttribPointer(vertexHandle, 3, GLES20.GL_FLOAT, false, 0, mTeapot.getVertices());
+    GLES20.glVertexAttribPointer(textureCoordHandle, 2, GLES20.GL_FLOAT, false, 0,
+        mTeapot.getTexCoords());
+
+    GLES20.glEnableVertexAttribArray(vertexHandle);
+    GLES20.glEnableVertexAttribArray(textureCoordHandle);
+
+    // activate texture 0, bind it, and pass to shader
+    GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+    GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextures.get(textureIndex).mTextureID[0]);
+    GLES20.glUniform1i(texSampler2DHandle, 0);
+
+    // pass the model view matrix to the shader
+    GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false, modelViewProjection, 0);
+
+    // finally draw the teapot
+    GLES20.glDrawElements(GLES20.GL_TRIANGLES, mTeapot.getNumObjectIndex(),
+        GLES20.GL_UNSIGNED_SHORT, mTeapot.getIndices());
+
+    // disable the enabled arrays
+    GLES20.glDisableVertexAttribArray(vertexHandle);
+    GLES20.glDisableVertexAttribArray(textureCoordHandle);
+
+    SampleUtils.checkGLError("CloudReco renderFrame");
   }
 }
