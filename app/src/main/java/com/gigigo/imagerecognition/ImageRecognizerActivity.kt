@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import com.gigigo.imagerecognition.vuforia.ContextProvider
 import com.gigigo.imagerecognition.vuforia.ImageRecognitionVuforia
 
@@ -57,7 +58,11 @@ class ImageRecognizerActivity : AppCompatActivity() {
   }
 
   private fun showResponseCode(code: String) {
-    codeTv.text = "CODE= $code"
+    try {
+      Toast.makeText(this, "CODE= $code", Toast.LENGTH_LONG).show()
+      codeTv.text = "CODE= $code"
+    } catch (th: Throwable ) {
+    }
   }
 
   private fun startVuforia() {
@@ -66,7 +71,6 @@ class ImageRecognizerActivity : AppCompatActivity() {
     ImageRecognitionVuforia.onRecognizedPattern {
       showResponseCode(it)
     }
-
 
 
     val contextProvider = object : ContextProvider {

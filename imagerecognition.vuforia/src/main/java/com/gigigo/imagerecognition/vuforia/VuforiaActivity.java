@@ -126,21 +126,21 @@ public class VuforiaActivity extends FragmentActivity implements ICloudRecogniti
   }
 
   private void scanlineStart() {
-    this.runOnUiThread(new Runnable() {
+   /* this.runOnUiThread(new Runnable() {
       @Override public void run() {
         scanLine.setVisibility(View.VISIBLE);
         scanLine.setAnimation(scanAnimation);
       }
-    });
+    });*/
   }
 
   private void scanlineStop() {
-    this.runOnUiThread(new Runnable() {
+    /*this.runOnUiThread(new Runnable() {
       @Override public void run() {
         scanLine.setVisibility(View.GONE);
         scanLine.clearAnimation();
       }
-    });
+    });*/
   }
   //endregion
 
@@ -154,13 +154,13 @@ public class VuforiaActivity extends FragmentActivity implements ICloudRecogniti
     //or start4result, and setresult, or callback by the broadcast
     if (mCodeResult != -1) {
       setResult(Activity.RESULT_OK, i);
-      finish();
+     // finish();
     } else {
       //we add package appid,
       String appId = getApplicationContext().getPackageName();
       i.putExtra(appId, appId);
       ImageRecognitionVuforia.Companion.sendRecognizedPattern(i);
-      finish();
+     // finish();
     }
   }
 

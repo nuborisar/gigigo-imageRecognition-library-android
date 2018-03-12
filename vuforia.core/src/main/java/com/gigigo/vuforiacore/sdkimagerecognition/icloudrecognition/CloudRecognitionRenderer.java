@@ -17,14 +17,13 @@ import com.vuforia.Renderer;
 import com.vuforia.State;
 import com.vuforia.Tool;
 import com.vuforia.TrackableResult;
-import com.vuforia.VIDEO_BACKGROUND_REFLECTION;
 import com.vuforia.Vuforia;
 import java.util.Vector;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 public class CloudRecognitionRenderer implements GLSurfaceView.Renderer, SampleAppRendererControl {
-  private static final float OBJECT_SCALE_FLOAT = 3.0f;//0.003f
+  private static final float OBJECT_SCALE_FLOAT = 1.0f;//0.003f
   VuforiaSession vuforiaAppSession;
 
   private SampleAppRenderer mSampleAppRenderer;
@@ -113,7 +112,7 @@ public class CloudRecognitionRenderer implements GLSurfaceView.Renderer, SampleA
   @Deprecated private void renderFrame() {
     //region render frame old
     // Clear color and depth buffer
-    GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+  /*  GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
     // Get the state from Vuforia and mark the beginning of a rendering
     // section
@@ -171,7 +170,7 @@ public class CloudRecognitionRenderer implements GLSurfaceView.Renderer, SampleA
                 System.out.println("************************" + objectSize2.toString());
 
             }
-*/
+
       mCloudReco.stopFinderIfStarted();
       // Renders the Augmentation View with the 3D Book data Panel
       renderAugmentation(trackableResult);
@@ -181,7 +180,7 @@ public class CloudRecognitionRenderer implements GLSurfaceView.Renderer, SampleA
 
     GLES20.glDisable(GLES20.GL_DEPTH_TEST);
 
-    Renderer.getInstance().end();
+    Renderer.getInstance().end();*/
     //endregion
     //region new code
    /* // Renders video background replacing Renderer.DrawVideoBackground()
@@ -215,7 +214,7 @@ public class CloudRecognitionRenderer implements GLSurfaceView.Renderer, SampleA
   }
 
   @Deprecated private void renderAugmentation(TrackableResult trackableResult) {
-    Matrix44F modelViewMatrix_Vuforia = Tool.convertPose2GLMatrix(trackableResult.getPose());
+    /*Matrix44F modelViewMatrix_Vuforia = Tool.convertPose2GLMatrix(trackableResult.getPose());
     float[] modelViewMatrix = modelViewMatrix_Vuforia.getData();
 
     int textureIndex = 0;
@@ -249,6 +248,7 @@ public class CloudRecognitionRenderer implements GLSurfaceView.Renderer, SampleA
     GLES20.glDisableVertexAttribArray(textureCoordHandle);
 
     VuforiaUtils.checkGLError("CloudReco renderFrame");
+    */
   }
 
   public void setTextures(Vector<Texture> textures) {

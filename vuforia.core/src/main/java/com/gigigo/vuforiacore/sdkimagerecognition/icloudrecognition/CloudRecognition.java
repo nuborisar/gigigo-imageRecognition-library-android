@@ -24,6 +24,7 @@ import com.gigigo.vuforiacore.sdkimagerecognition.vuforiaenvironment.Application
 import com.gigigo.vuforiacore.sdkimagerecognition.vuforiaenvironment.VuforiaException;
 import com.gigigo.vuforiacore.sdkimagerecognition.vuforiaenvironment.VuforiaSession;
 import com.gigigo.vuforiacore.sdkimagerecognition.vuforiaenvironment.utils.LoadingDialogHandler;
+import com.gigigo.vuforiacore.sdkimagerecognition.vuforiaenvironment.utils.Texture;
 import com.gigigo.vuforiacore.sdkimagerecognition.vuforiaenvironment.utils.VuforiaGLView;
 import com.vuforia.CameraDevice;
 import com.vuforia.ObjectTracker;
@@ -34,6 +35,7 @@ import com.vuforia.Trackable;
 import com.vuforia.Tracker;
 import com.vuforia.TrackerManager;
 import com.vuforia.Vuforia;
+import java.util.Vector;
 
 public class CloudRecognition implements ApplicationControl {
   // These codes match the ones defined in TargetFinder in Vuforia.jar
@@ -81,6 +83,9 @@ public class CloudRecognition implements ApplicationControl {
   private View scanLine;
   private TranslateAnimation scanAnimation;
 
+  // The textures we will use for rendering:
+  private Vector<Texture> mTextures;
+
   public CloudRecognition(Activity activity, ICloudRecognitionCommunicator communicator,
       String kAccessKey, String kSecretKey, String kLicenseKey, boolean showErrorMessages) {
     this.mActivity = activity;
@@ -121,13 +126,23 @@ public class CloudRecognition implements ApplicationControl {
         // Creates the GestureDetector listener for processing double tap
         mGestureDetector = new GestureDetector(this.mActivity, new GestureListener());
 
+
+        mTextures = new Vector<Texture>();
+        loadTextures();
+
         mIsDroidDevice = Build.MODEL.toLowerCase().startsWith("droid");
       }
     } catch (Throwable tr) {
       Log.e(LOGTAG, tr.getMessage());
     }
   }
-
+  // We want to load specific textures from the APK, which we will later use
+  // for rendering.
+  private void loadTextures()
+  {
+    mTextures.add(Texture.loadTextureFromApk("TextureTeapotRed.png",
+        mActivity.getAssets()));
+  }
   // Called when the activity will start interacting with the user.
   protected void on_Resume() {
     // This is needed for some Droid devices to force portrait
@@ -138,8 +153,8 @@ public class CloudRecognition implements ApplicationControl {
 
     try {
       if (vuforiaAppSession != null) vuforiaAppSession.resumeAR();
-    } catch (VuforiaException e) {
-      Log.e(LOGTAG, e.getString());
+    } catch (Exception e) {
+      Log.e(LOGTAG, e.toString());
     }
 
     // Resume the GL view:
@@ -238,6 +253,7 @@ public class CloudRecognition implements ApplicationControl {
 
     // Setups the Renderer of the GLView
     mRenderer = new CloudRecognitionRenderer(vuforiaAppSession, this);
+    mRenderer.setTextures(mTextures);
     mGlView.setRenderer(mRenderer);
   }
 
@@ -508,20 +524,21 @@ public class CloudRecognition implements ApplicationControl {
   }
 
   @Override public void onInitARDone(VuforiaException exception) {
-    if (exception == null) {
+
+    if (exception == null)
+    {
       initApplicationAR();
 
-      // Start the camera:
-      try {
-        vuforiaAppSession.startAR(CameraDevice.CAMERA_DIRECTION.CAMERA_DIRECTION_DEFAULT);
-      } catch (VuforiaException e) {
-        Log.e(LOGTAG, e.getMessage());
-      }
+      mRenderer.setActive(true);
 
-      boolean result = CameraDevice.getInstance()
-          .setFocusMode(CameraDevice.FOCUS_MODE.FOCUS_MODE_CONTINUOUSAUTO);
+      // Now add the GL surface view. It is important
+      // that the OpenGL ES surface view gets added
+      // BEFORE the camera is started and video
+      // background is configured.
+     mActivity.addContentView(mGlView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+          ViewGroup.LayoutParams.MATCH_PARENT));
 
-      if (!result) Log.e(LOGTAG, "Unable to enable continuous autofocus");
+      vuforiaAppSession.startAR(CameraDevice.CAMERA_DIRECTION.CAMERA_DIRECTION_DEFAULT);
 
       mUILayout.bringToFront();
 
@@ -529,18 +546,60 @@ public class CloudRecognition implements ApplicationControl {
       loadingDialogHandler.sendEmptyMessage(HIDE_LOADING_DIALOG);
 
       mUILayout.setBackgroundColor(Color.TRANSPARENT);
-      this.mCommunicator.setContentViewTop(mGlView);
-    } else {
-      Log.e(LOGTAG, exception.getString());
-      if (mInitErrorCode != 0) {
 
-        showErrorMessage(mInitErrorCode, 10, true);
-      } else {
-        this.mActivity.finish();
-        Log.e(LOGTAG, exception.getMessage());
+      //mSampleAppMenu = new SampleAppMenu(this, this, "Cloud Reco",
+      //    mGlView, mUILayout, null);
+      //setSampleAppMenuSettings();
+
+    } else
+    {
+      Log.e(LOGTAG, exception.getString());
+      if(mInitErrorCode != 0)
+      {
+        showErrorMessage(mInitErrorCode,10, true);
+      }
+      else
+      {
+        showInitializationErrorMessage(exception.getString());
       }
     }
   }
+  public void showInitializationErrorMessage(String message)
+  {
+    //asv todo esto hay que  hacer algo parecido
+    //final String errorMessage = message;
+    //runOnUiThread(new Runnable()
+    //{
+    //  public void run()
+    //  {
+    //    if (mErrorDialog != null)
+    //    {
+    //      mErrorDialog.dismiss();
+    //    }
+    //
+    //    // Generates an Alert Dialog to show the error message
+    //    AlertDialog.Builder builder = new AlertDialog.Builder(
+    //        mActivity);
+    //    builder
+    //        .setMessage(errorMessage)
+    //        .setTitle(mActivity.getResources().getString(R.string.INIT_ERROR))
+    //        .setCancelable(false)
+    //        .setIcon(0)
+    //        .setPositiveButton(getString(R.string.button_OK),
+    //            new DialogInterface.OnClickListener()
+    //            {
+    //              public void onClick(DialogInterface dialog, int id)
+    //              {
+    //                finish();
+    //              }
+    //            });
+    //
+    //    mErrorDialog = builder.create();
+    //    mErrorDialog.show();
+    //  }
+    //});
+  }
+
 
   @Override public void onVuforiaUpdate(State state) {
 
@@ -583,6 +642,44 @@ public class CloudRecognition implements ApplicationControl {
           // this.mCommunicator.onVuforiaResult(trackable, result.getUniqueTargetId());
           this.mCommunicator.onVuforiaResult(trackable, result);
         }
+      }
+    }
+  }
+
+  @Override public void onVuforiaResumed() {
+    if (mGlView != null)
+    {
+      mGlView.setVisibility(View.VISIBLE);
+      mGlView.onResume();
+    }
+  }
+
+  @Override public void onVuforiaStarted() {
+    // Set camera focus mode
+    if(!CameraDevice.getInstance().setFocusMode(CameraDevice.FOCUS_MODE.FOCUS_MODE_CONTINUOUSAUTO))
+    {
+      // If continuous autofocus mode fails, attempt to set to a different mode
+      if(!CameraDevice.getInstance().setFocusMode(CameraDevice.FOCUS_MODE.FOCUS_MODE_TRIGGERAUTO))
+      {
+        CameraDevice.getInstance().setFocusMode(CameraDevice.FOCUS_MODE.FOCUS_MODE_NORMAL);
+      }
+    }
+
+    showProgressIndicator(false);
+  }
+  public void showProgressIndicator(boolean show)
+  {
+    if (loadingDialogHandler != null)
+    {
+      if (show)
+      {
+        loadingDialogHandler
+            .sendEmptyMessage(LoadingDialogHandler.SHOW_LOADING_DIALOG);
+      }
+      else
+      {
+        loadingDialogHandler
+            .sendEmptyMessage(LoadingDialogHandler.HIDE_LOADING_DIALOG);
       }
     }
   }
