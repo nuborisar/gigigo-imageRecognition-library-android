@@ -73,7 +73,6 @@ public class VuforiaActivity extends FragmentActivity implements ICloudRecogniti
     RelativeLayout relativeLayout = (RelativeLayout) view.findViewById(R.id.layoutContentVuforiaGL);
     relativeLayout.addView(vuforiaView, 0);
     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB)
-
     {
       markFakeFeaturePoint = new MarkFakeFeaturePoint(this);
     }
@@ -126,34 +125,34 @@ public class VuforiaActivity extends FragmentActivity implements ICloudRecogniti
   }
 
   private void scanlineStart() {
-   /* this.runOnUiThread(new Runnable() {
+    this.runOnUiThread(new Runnable() {
       @Override public void run() {
         scanLine.setVisibility(View.VISIBLE);
         scanLine.setAnimation(scanAnimation);
       }
-    });*/
+    });
   }
 
   private void scanlineStop() {
-    /*this.runOnUiThread(new Runnable() {
+    this.runOnUiThread(new Runnable() {
       @Override public void run() {
         scanLine.setVisibility(View.GONE);
         scanLine.clearAnimation();
       }
-    });*/
+    });
   }
   //endregion
 
   @Override public void onVuforiaResult(Trackable trackable, TargetSearchResult result) {
     scanlineStop();
-    sendRecognizedPatternToClient(result);
+    //asv esto ahora peta, cruje la app, hay q ver el puto kotlin sendRecognizedPatternToClient(result);
   }
 
   private void sendRecognizedPatternToClient(TargetSearchResult result) {
     Intent i = setDataIntent(result);
     //or start4result, and setresult, or callback by the broadcast
     if (mCodeResult != -1) {
-      setResult(Activity.RESULT_OK, i);
+    //  setResult(Activity.RESULT_OK, i);
      // finish();
     } else {
       //we add package appid,

@@ -11,20 +11,15 @@ package com.gigigo.vuforiacore.sdkimagerecognition.vuforiaenvironment;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.OrientationEventListener;
 import android.view.WindowManager;
 import com.gigigo.vuforiacore.R;
-import com.vuforia.CameraCalibration;
 import com.vuforia.CameraDevice;
 import com.vuforia.Device;
-import com.vuforia.INIT_ERRORCODE;
 import com.vuforia.State;
-import com.vuforia.Tool;
 import com.vuforia.Vuforia;
 import com.vuforia.Vuforia.UpdateCallbackInterface;
 
@@ -90,20 +85,14 @@ public class VuforiaSession implements UpdateCallbackInterface {
     // ie: Left Landscape to Right Landscape.  Vuforia needs to react to this change and the
     // VuforiaSession needs to update the Projection Matrix.
     OrientationEventListener orientationEventListener = new OrientationEventListener(mActivity) {
-      int mLastRotation = -1;
-
       @Override public void onOrientationChanged(int i) {
-        try {
-          int activityRotation = mActivity.getWindowManager().getDefaultDisplay().getRotation();
-          if (mLastRotation != activityRotation) {
-            // Signal the ApplicationSession to refresh the projection matrix
-           // setProjectionMatrix();
-            mLastRotation = activityRotation;
-          }
-        } catch (Exception ex) {
-          Log.e(LOGTAG, ex.getMessage());
+        int activityRotation = mActivity.getWindowManager().getDefaultDisplay().getRotation();
+        if (mLastRotation != activityRotation) {
+          mLastRotation = activityRotation;
         }
       }
+
+      int mLastRotation = -1;
     };
 
     if (orientationEventListener.canDetectOrientation()) orientationEventListener.enable();
@@ -247,6 +236,7 @@ public class VuforiaSession implements UpdateCallbackInterface {
               logMessage);
       Log.e(LOGTAG, logMessage);
     }
+    //todo asv ojo que aki no se está lo q inicializa el modo video de la camara
 
     if (vuforiaException != null) {
       // Send Vuforia Exception to the application and call initDone
@@ -305,9 +295,29 @@ public class VuforiaSession implements UpdateCallbackInterface {
     }
   }
 
+
+
   // Resumes Vuforia, restarts the trackers and the camera
+  public void resumeAR() {
+    VuforiaException vuforiaException = null;
 
+    try {
+      mResumeVuforiaTask = new ResumeVuforiaTask();
+      mResumeVuforiaTask.execute();
+    } catch (Exception e) {
+      String logMessage = "Resuming Vuforia failed";
+      vuforiaException =
+          new VuforiaException(VuforiaException.INITIALIZATION_FAILURE,
+              logMessage);
+      Log.e(LOGTAG, logMessage);
+    }
 
+    if (vuforiaException != null) {
+      // Send Vuforia Exception to the application and call initDone
+      // to stop initialization process
+      mSessionControl.onInitARDone(vuforiaException);
+    }
+  }
   // Pauses Vuforia and stops the camera
   public void pauseAR() throws VuforiaException {
     if (mStarted) {
@@ -339,8 +349,7 @@ public class VuforiaSession implements UpdateCallbackInterface {
     }
   }
   // Methods to be called to handle lifecycle
-  // Methods to be called to handle lifecycle
-  public void onResume() {
+   public void onResume() {
     if (mResumeVuforiaTask == null
         || mResumeVuforiaTask.getStatus() == ResumeVuforiaTask.Status.FINISHED) {
       // onResume() will sometimes be called twice depending on the screen lock mode
@@ -348,27 +357,7 @@ public class VuforiaSession implements UpdateCallbackInterface {
       resumeAR();
     }
   }
-  // Resumes Vuforia, restarts the trackers and the camera
-  public void resumeAR() {
-    VuforiaException vuforiaException = null;
 
-    try {
-      mResumeVuforiaTask = new ResumeVuforiaTask();
-      mResumeVuforiaTask.execute();
-    } catch (Exception e) {
-      String logMessage = "Resuming Vuforia failed";
-      vuforiaException =
-          new VuforiaException(VuforiaException.INITIALIZATION_FAILURE,
-              logMessage);
-      Log.e(LOGTAG, logMessage);
-    }
-
-    if (vuforiaException != null) {
-      // Send Vuforia Exception to the application and call initDone
-      // to stop initialization process
-      mSessionControl.onInitARDone(vuforiaException);
-    }
-  }
   public void onPause() {
     Vuforia.onPause();
   }
@@ -453,9 +442,10 @@ public class VuforiaSession implements UpdateCallbackInterface {
   public void stopCamera() {
     if (mCameraRunning) {
       mSessionControl.doStopTrackers();
+      mCameraRunning = false;
       CameraDevice.getInstance().stop();
       CameraDevice.getInstance().deinit();
-      mCameraRunning = false;
+
     }
   }
 

@@ -126,7 +126,6 @@ public class CloudRecognition implements ApplicationControl {
         // Creates the GestureDetector listener for processing double tap
         mGestureDetector = new GestureDetector(this.mActivity, new GestureListener());
 
-
         mTextures = new Vector<Texture>();
         loadTextures();
 
@@ -136,13 +135,13 @@ public class CloudRecognition implements ApplicationControl {
       Log.e(LOGTAG, tr.getMessage());
     }
   }
+
   // We want to load specific textures from the APK, which we will later use
   // for rendering.
-  private void loadTextures()
-  {
-    mTextures.add(Texture.loadTextureFromApk("TextureTeapotRed.png",
-        mActivity.getAssets()));
+  private void loadTextures() {
+    mTextures.add(Texture.loadTextureFromApk("TextureTeapotRed.png", mActivity.getAssets()));
   }
+
   // Called when the activity will start interacting with the user.
   protected void on_Resume() {
     // This is needed for some Droid devices to force portrait
@@ -152,7 +151,10 @@ public class CloudRecognition implements ApplicationControl {
     }
 
     try {
-      if (vuforiaAppSession != null) vuforiaAppSession.resumeAR();
+      if (vuforiaAppSession != null) {
+        vuforiaAppSession.resumeAR();
+        vuforiaAppSession.onResume();
+      }
     } catch (Exception e) {
       Log.e(LOGTAG, e.toString());
     }
@@ -525,8 +527,7 @@ public class CloudRecognition implements ApplicationControl {
 
   @Override public void onInitARDone(VuforiaException exception) {
 
-    if (exception == null)
-    {
+    if (exception == null) {
       initApplicationAR();
 
       mRenderer.setActive(true);
@@ -535,8 +536,9 @@ public class CloudRecognition implements ApplicationControl {
       // that the OpenGL ES surface view gets added
       // BEFORE the camera is started and video
       // background is configured.
-     mActivity.addContentView(mGlView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-          ViewGroup.LayoutParams.MATCH_PARENT));
+      mActivity.addContentView(mGlView,
+          new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+              ViewGroup.LayoutParams.MATCH_PARENT));
 
       vuforiaAppSession.startAR(CameraDevice.CAMERA_DIRECTION.CAMERA_DIRECTION_DEFAULT);
 
@@ -551,21 +553,17 @@ public class CloudRecognition implements ApplicationControl {
       //    mGlView, mUILayout, null);
       //setSampleAppMenuSettings();
 
-    } else
-    {
+    } else {
       Log.e(LOGTAG, exception.getString());
-      if(mInitErrorCode != 0)
-      {
-        showErrorMessage(mInitErrorCode,10, true);
-      }
-      else
-      {
+      if (mInitErrorCode != 0) {
+        showErrorMessage(mInitErrorCode, 10, true);
+      } else {
         showInitializationErrorMessage(exception.getString());
       }
     }
   }
-  public void showInitializationErrorMessage(String message)
-  {
+
+  public void showInitializationErrorMessage(String message) {
     //asv todo esto hay que  hacer algo parecido
     //final String errorMessage = message;
     //runOnUiThread(new Runnable()
@@ -600,28 +598,25 @@ public class CloudRecognition implements ApplicationControl {
     //});
   }
 
+  Trackable mLastTrackable = null;
+  TargetSearchResult mLastResult = null;
 
   @Override public void onVuforiaUpdate(State state) {
 
     // Get the tracker manager:
     TrackerManager trackerManager = TrackerManager.getInstance();
-
     // Get the object tracker:
     ObjectTracker objectTracker =
         (ObjectTracker) trackerManager.getTracker(ObjectTracker.getClassType());
-
     // Get the target finder:
     TargetFinder finder = objectTracker.getTargetFinder();
-
     // Check if there are new results available:
     final int statusCode = finder.updateSearchResults();
-
+    System.out.println("Vuforiaupdate statusCode" + statusCode);
     // Show a message if we encountered an error:
     if (statusCode < 0) {
-
       boolean closeAppAfterError = (statusCode == UPDATE_ERROR_NO_NETWORK_CONNECTION
           || statusCode == UPDATE_ERROR_SERVICE_NOT_AVAILABLE);
-
       showErrorMessage(statusCode, state.getFrame().getTimeStamp(), closeAppAfterError);
     } else if (statusCode == TargetFinder.UPDATE_RESULTS_AVAILABLE) {
       // Process new search results
@@ -637,18 +632,26 @@ public class CloudRecognition implements ApplicationControl {
 
           if (mExtendedTracking) trackable.startExtendedTracking();
 
-          //raise result 2 vuforiaactivity over pipe/communicator
+          System.out.println("Vuforiaupdate finder.getResultCount");
 
+          //raise result 2 vuforiaactivity over pipe/communicator
+          mLastTrackable = trackable;
+          mLastResult = result;
           // this.mCommunicator.onVuforiaResult(trackable, result.getUniqueTargetId());
           this.mCommunicator.onVuforiaResult(trackable, result);
         }
+      }
+    }  else if (statusCode == TargetFinder.UPDATE_NO_REQUEST) {
+
+      if(mLastTrackable!=null && mLastResult!=null)
+      {
+        this.mCommunicator.onVuforiaResult(mLastTrackable, mLastResult);
       }
     }
   }
 
   @Override public void onVuforiaResumed() {
-    if (mGlView != null)
-    {
+    if (mGlView != null) {
       mGlView.setVisibility(View.VISIBLE);
       mGlView.onResume();
     }
@@ -656,30 +659,24 @@ public class CloudRecognition implements ApplicationControl {
 
   @Override public void onVuforiaStarted() {
     // Set camera focus mode
-    if(!CameraDevice.getInstance().setFocusMode(CameraDevice.FOCUS_MODE.FOCUS_MODE_CONTINUOUSAUTO))
-    {
+    if (!CameraDevice.getInstance()
+        .setFocusMode(CameraDevice.FOCUS_MODE.FOCUS_MODE_CONTINUOUSAUTO)) {
       // If continuous autofocus mode fails, attempt to set to a different mode
-      if(!CameraDevice.getInstance().setFocusMode(CameraDevice.FOCUS_MODE.FOCUS_MODE_TRIGGERAUTO))
-      {
+      if (!CameraDevice.getInstance()
+          .setFocusMode(CameraDevice.FOCUS_MODE.FOCUS_MODE_TRIGGERAUTO)) {
         CameraDevice.getInstance().setFocusMode(CameraDevice.FOCUS_MODE.FOCUS_MODE_NORMAL);
       }
     }
 
     showProgressIndicator(false);
   }
-  public void showProgressIndicator(boolean show)
-  {
-    if (loadingDialogHandler != null)
-    {
-      if (show)
-      {
-        loadingDialogHandler
-            .sendEmptyMessage(LoadingDialogHandler.SHOW_LOADING_DIALOG);
-      }
-      else
-      {
-        loadingDialogHandler
-            .sendEmptyMessage(LoadingDialogHandler.HIDE_LOADING_DIALOG);
+
+  public void showProgressIndicator(boolean show) {
+    if (loadingDialogHandler != null) {
+      if (show) {
+        loadingDialogHandler.sendEmptyMessage(LoadingDialogHandler.SHOW_LOADING_DIALOG);
+      } else {
+        loadingDialogHandler.sendEmptyMessage(LoadingDialogHandler.HIDE_LOADING_DIALOG);
       }
     }
   }

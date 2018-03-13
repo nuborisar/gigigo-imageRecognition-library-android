@@ -23,18 +23,20 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 public class CloudRecognitionRenderer implements GLSurfaceView.Renderer, SampleAppRendererControl {
-  private static final float OBJECT_SCALE_FLOAT = 1.0f;//0.003f
-  VuforiaSession vuforiaAppSession;
+  private static final float OBJECT_SCALE_FLOAT = 0.003f;//0.003f
 
+  private VuforiaSession vuforiaAppSession;
   private SampleAppRenderer mSampleAppRenderer;
+
   private int shaderProgramID;
   private int vertexHandle;
-  private int normalHandle;
+
   private int textureCoordHandle;
   private int mvpMatrixHandle;
   private int texSampler2DHandle;
 
   private Vector<Texture> mTextures;
+  private Teapot mTeapot;
   private CloudRecognition mCloudReco;
 
   private boolean mIsActive = false;
@@ -100,7 +102,7 @@ public class CloudRecognitionRenderer implements GLSurfaceView.Renderer, SampleA
         CubeShaders.CUBE_MESH_FRAGMENT_SHADER);
 
     vertexHandle = GLES20.glGetAttribLocation(shaderProgramID, "vertexPosition");
-    normalHandle = GLES20.glGetAttribLocation(shaderProgramID, "vertexNormal");
+    //normalHandle = GLES20.glGetAttribLocation(shaderProgramID, "vertexNormal");
     textureCoordHandle = GLES20.glGetAttribLocation(shaderProgramID, "vertexTexCoord");
     mvpMatrixHandle = GLES20.glGetUniformLocation(shaderProgramID, "modelViewProjectionMatrix");
     texSampler2DHandle = GLES20.glGetUniformLocation(shaderProgramID, "texSampler2D");
@@ -255,7 +257,7 @@ public class CloudRecognitionRenderer implements GLSurfaceView.Renderer, SampleA
     mTextures = textures;
   }
 
-  @Override public void renderFrame(State state, float[] projectionMatrix) {
+   public void renderFrame(State state, float[] projectionMatrix) {
     // Renders video background replacing Renderer.DrawVideoBackground()
     mSampleAppRenderer.renderVideoBackground();
 
@@ -266,17 +268,17 @@ public class CloudRecognitionRenderer implements GLSurfaceView.Renderer, SampleA
     if (state.getNumTrackableResults() > 0) {
       // Gets current trackable result
       TrackableResult trackableResult = state.getTrackableResult(0);
-
       if (trackableResult == null) {
         return;
       }
-
       mCloudReco.stopFinderIfStarted();
-
+      System.out.println("*******************RENDER  1"+trackableResult.toString() +"projection:"+projectionMatrix.toString());
       // Renders the Augmentation View with the 3D Book data Panel
       renderAugmentation(trackableResult, projectionMatrix);
+
     } else {
       mCloudReco.startFinderIfStopped();
+      System.out.println("*******************RENDER  2");
     }
 
     GLES20.glDisable(GLES20.GL_DEPTH_TEST);
@@ -284,9 +286,12 @@ public class CloudRecognitionRenderer implements GLSurfaceView.Renderer, SampleA
     Renderer.getInstance().end();
   }
 
-  private Teapot mTeapot;
-
   private void renderAugmentation(TrackableResult trackableResult, float[] projectionMatrix) {
+
+    System.out.println("*******************RENDER AR");
+    //asv check this
+    //https://library.vuforia.com/content/vuforia-library/en/articles/Solution/Working-with-Vuforia-and-OpenGL-ES.html#How-To-Render-Static-3D-Models-using-OpenGL-ES
+    ///    https://developer.vuforia.com/forum/ios/how-render-complex-3d-models-animations
     Matrix44F modelViewMatrix_Vuforia = Tool.convertPose2GLMatrix(trackableResult.getPose());
     float[] modelViewMatrix = modelViewMatrix_Vuforia.getData();
 
@@ -318,7 +323,11 @@ public class CloudRecognitionRenderer implements GLSurfaceView.Renderer, SampleA
     // finally draw the teapot
     GLES20.glDrawElements(GLES20.GL_TRIANGLES, mTeapot.getNumObjectIndex(),
         GLES20.GL_UNSIGNED_SHORT, mTeapot.getIndices());
-
+    //try {
+    //  Thread.sleep(50);
+    //} catch (InterruptedException e) {
+    //  e.printStackTrace();
+    //}
     // disable the enabled arrays
     GLES20.glDisableVertexAttribArray(vertexHandle);
     GLES20.glDisableVertexAttribArray(textureCoordHandle);

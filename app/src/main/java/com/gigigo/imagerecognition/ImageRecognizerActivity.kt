@@ -13,9 +13,14 @@ import com.gigigo.imagerecognition.vuforia.ImageRecognitionVuforia
 
 class ImageRecognizerActivity : AppCompatActivity() {
 
-  private val licenseKey: String = "Abi5nL//////AAAAAXzdWR6MxEppinKbZ9qJjhU7Op5/+8Pwm8tdYfI4f3zFmRweYqowENwgiOUAtaiIH06OpQFISbhX9Linf/uq5JXUADO/MFrnbzy/UIuA3whurbD+Q18bV3uRrm2FtvF64fWdH7R1GoAbOEL6wbF621Da0JJ4uVYAZEYOga/6C4fBEtf0LpKoetdNIVpIxvWsIWHRNVWX41gbRTmwSqCnoV1axtSqBAalAx5Oq/GjoD4a8isoBRJMhkIEOR+4Q7lbyJrQatD+9TqINi9wAuBY9/atNKA27AzMpnQcuAaSr2rv8Y8r3wtk7yQY7oTm8CrBMLri+TdEZoF6Z/TdZaupRaqrlKZqtptOme0zoodbOTVe"
-  private val clientAccessKey: String = "fe4d316136ea6b7ee5faa72c4884e33805128b08"
-  private val clientSecretKey: String = "670f15bb4cd34c1621a892ced5321896c0b70df6"
+//  private val licenseKey: String = "Abi5nL//////AAAAAXzdWR6MxEppinKbZ9qJjhU7Op5/+8Pwm8tdYfI4f3zFmRweYqowENwgiOUAtaiIH06OpQFISbhX9Linf/uq5JXUADO/MFrnbzy/UIuA3whurbD+Q18bV3uRrm2FtvF64fWdH7R1GoAbOEL6wbF621Da0JJ4uVYAZEYOga/6C4fBEtf0LpKoetdNIVpIxvWsIWHRNVWX41gbRTmwSqCnoV1axtSqBAalAx5Oq/GjoD4a8isoBRJMhkIEOR+4Q7lbyJrQatD+9TqINi9wAuBY9/atNKA27AzMpnQcuAaSr2rv8Y8r3wtk7yQY7oTm8CrBMLri+TdEZoF6Z/TdZaupRaqrlKZqtptOme0zoodbOTVe"
+//  private val clientAccessKey: String = "fe4d316136ea6b7ee5faa72c4884e33805128b08"
+//  private val clientSecretKey: String = "670f15bb4cd34c1621a892ced5321896c0b70df6"
+
+  //patxi license
+  private val LICENSE_KEY = "AYQlF+z/////AAAAmZNxjAfBiUzJpd4uNBnJf4oQoQUu+r+qGO3ASpGlO3UKUUuBQNGeQVgrJwPrNKRN8EAiwtXj114QEc+1TkF1RJ7V71u2wUuiMI1ujJBnIyGVHqYLG9/poCuChR0pMrj1HSyUzH91HXKQQKT4739+anOWvK60Vobedg+K2cg2hFwfXj9n5jeU6nNxlLwagevf7+mDGR716bX5/rMgyRnnp+VXPwuJe8ZrVS8VsS2UUtezLcxyl9ZJ7sGcrT8F4nSkuccmF0zA1yG+hisPQvUb73hn1EZqQjzKpz+hr34LAfVi1IKWNvqDSmepPO1q5iwCUuudu8bunh4QMPO16YMyMzZsK5H+FnHzSAGVc9NBj3zZ"
+  private val kAccessKey = "2675f5fd69af0cdae84e7f00728d063ed1c0f16b"
+  private val kSecretKey = "ae194c709ddd667bf466e1cf47cbb019027b2c99"
 
   private lateinit var licenseKeyTv: TextView
   private lateinit var accessKeyTv: TextView
@@ -28,9 +33,12 @@ class ImageRecognizerActivity : AppCompatActivity() {
 
     initViews()
 
-    licenseKeyTv.text = "license key: ${licenseKey}"
-    accessKeyTv.text = "access key: ${clientAccessKey}"
-    secretKeyTv.text = "secret key: ${clientSecretKey}"
+//    licenseKeyTv.text = "license key: ${licenseKey}"
+//    accessKeyTv.text = "access key: ${clientAccessKey}"
+//    secretKeyTv.text = "secret key: ${clientSecretKey}"
+    licenseKeyTv.text = "license key: ${LICENSE_KEY}"
+    accessKeyTv.text = "access key: ${kAccessKey}"
+    secretKeyTv.text = "secret key: ${kSecretKey}"
   }
 
   private fun initViews() {
@@ -60,7 +68,7 @@ class ImageRecognizerActivity : AppCompatActivity() {
   private fun showResponseCode(code: String) {
     try {
       Toast.makeText(this, "CODE= $code", Toast.LENGTH_LONG).show()
-      codeTv.text = "CODE= $code"
+     // codeTv.text = "CODE= $code"
     } catch (th: Throwable ) {
     }
   }
@@ -82,9 +90,14 @@ class ImageRecognizerActivity : AppCompatActivity() {
     imageRecognition.setContextProvider(contextProvider)
 
     val vuforiaCredentials = object : Credentials {
-      override fun getLicensekey(): String = this@ImageRecognizerActivity.licenseKey
-      override fun getClientAccessKey(): String = this@ImageRecognizerActivity.clientAccessKey
-      override fun getClientSecretKey(): String = this@ImageRecognizerActivity.clientSecretKey
+//      override fun getLicensekey(): String = this@ImageRecognizerActivity.licenseKey
+//      override fun getClientAccessKey(): String = this@ImageRecognizerActivity.clientAccessKey
+//      override fun getClientSecretKey(): String = this@ImageRecognizerActivity.clientSecretKey
+
+
+      override fun getLicensekey(): String = this@ImageRecognizerActivity.LICENSE_KEY
+      override fun getClientAccessKey(): String = this@ImageRecognizerActivity.kAccessKey
+      override fun getClientSecretKey(): String = this@ImageRecognizerActivity.kSecretKey
     }
     imageRecognition.startImageRecognition(vuforiaCredentials)
   }
