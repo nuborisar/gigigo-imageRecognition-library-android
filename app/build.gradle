@@ -17,6 +17,10 @@ android {
     versionCode generateAutoVersionCode()
     versionName getVersionName(rootProject.ext.versionName)
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    ndk {
+      abiFilters "armeabi-v7a"
+      //, "x86" "armeabi", "mips" //asv this have anysense, libVuforia ONLY exists in Armv7abi
+    }
   }
   buildTypes {
     release {

@@ -139,7 +139,8 @@ public class VuforiaSession implements UpdateCallbackInterface {
       }
     }
 
-    if (vuforiaException != null) mSessionControl.onInitARDone(vuforiaException);
+    if (vuforiaException != null)
+      mSessionControl.onInitARDone(vuforiaException);
   }
   private void startCameraAndTrackers(int camera) throws VuforiaException {
     String error;

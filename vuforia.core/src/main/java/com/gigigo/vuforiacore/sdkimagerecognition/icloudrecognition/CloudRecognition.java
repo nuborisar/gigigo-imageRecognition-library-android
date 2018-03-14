@@ -536,16 +536,22 @@ public class CloudRecognition implements ApplicationControl {
       // that the OpenGL ES surface view gets added
       // BEFORE the camera is started and video
       // background is configured.
-      mActivity.addContentView(mGlView,
-          new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-              ViewGroup.LayoutParams.MATCH_PARENT));
+      //mActivity.addContentView(mGlView,
+      //    new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+      //        ViewGroup.LayoutParams.MATCH_PARENT));
 
-      vuforiaAppSession.startAR(CameraDevice.CAMERA_DIRECTION.CAMERA_DIRECTION_DEFAULT);
+
+      //asv todo esta es la forma buena de agregar el layout
+      this.mCommunicator.setContentViewTop(mGlView);
+
+      vuforiaAppSession.startAR(CameraDevice.CAMERA_DIRECTION.CAMERA_DIRECTION_BACK);
 
       mUILayout.bringToFront();
 
       // Hides the Loading Dialog
       loadingDialogHandler.sendEmptyMessage(HIDE_LOADING_DIALOG);
+
+
 
       mUILayout.setBackgroundColor(Color.TRANSPARENT);
 
@@ -598,56 +604,55 @@ public class CloudRecognition implements ApplicationControl {
     //});
   }
 
-  Trackable mLastTrackable = null;
-  TargetSearchResult mLastResult = null;
+ static Trackable mLastTrackable = null;
+static  TargetSearchResult mLastResult = null;
 
   @Override public void onVuforiaUpdate(State state) {
 
-    // Get the tracker manager:
-    TrackerManager trackerManager = TrackerManager.getInstance();
-    // Get the object tracker:
-    ObjectTracker objectTracker =
-        (ObjectTracker) trackerManager.getTracker(ObjectTracker.getClassType());
-    // Get the target finder:
-    TargetFinder finder = objectTracker.getTargetFinder();
-    // Check if there are new results available:
-    final int statusCode = finder.updateSearchResults();
-    System.out.println("Vuforiaupdate statusCode" + statusCode);
-    // Show a message if we encountered an error:
-    if (statusCode < 0) {
-      boolean closeAppAfterError = (statusCode == UPDATE_ERROR_NO_NETWORK_CONNECTION
-          || statusCode == UPDATE_ERROR_SERVICE_NOT_AVAILABLE);
-      showErrorMessage(statusCode, state.getFrame().getTimeStamp(), closeAppAfterError);
-    } else if (statusCode == TargetFinder.UPDATE_RESULTS_AVAILABLE) {
-      // Process new search results
-      if (finder.getResultCount() > 0) {
-        TargetSearchResult result = finder.getResult(0);
-        Log.i("#################", "#################" + result.getMetaData() + "");
-        Log.i("#################", "#################" + finder.getResultCount() + "");
+      // Get the tracker manager:
+      TrackerManager trackerManager = TrackerManager.getInstance();
+      // Get the object tracker:
+      ObjectTracker objectTracker =
+          (ObjectTracker) trackerManager.getTracker(ObjectTracker.getClassType());
+      // Get the target finder:
+      TargetFinder finder = objectTracker.getTargetFinder();
+      // Check if there are new results available:
+      final int statusCode = finder.updateSearchResults();
+      System.out.println("Vuforiaupdate statusCode" + statusCode);
+      // Show a message if we encountered an error:
+      if (statusCode < 0) {
+        boolean closeAppAfterError = (statusCode == UPDATE_ERROR_NO_NETWORK_CONNECTION
+            || statusCode == UPDATE_ERROR_SERVICE_NOT_AVAILABLE);
+        showErrorMessage(statusCode, state.getFrame().getTimeStamp(), closeAppAfterError);
+      } else if (statusCode == TargetFinder.UPDATE_RESULTS_AVAILABLE) {
+        // Process new search results
+        if (finder.getResultCount() > 0) {
+          TargetSearchResult result = finder.getResult(0);
+          Log.i("#################", "#################" + result.getMetaData() + "");
+          Log.i("#################", "#################" + finder.getResultCount() + "");
 
-        // Check if this target is suitable for tracking:
-        if (result.getTrackingRating() > 0) {
+          // Check if this target is suitable for tracking:
+          if (result.getTrackingRating() > 0) {
 
-          Trackable trackable = finder.enableTracking(result);
+            Trackable trackable = finder.enableTracking(result);
 
-          if (mExtendedTracking) trackable.startExtendedTracking();
+            if (mExtendedTracking) trackable.startExtendedTracking();
 
-          System.out.println("Vuforiaupdate finder.getResultCount");
+            System.out.println("Vuforiaupdate finder.getResultCount");
 
-          //raise result 2 vuforiaactivity over pipe/communicator
-          mLastTrackable = trackable;
-          mLastResult = result;
-          // this.mCommunicator.onVuforiaResult(trackable, result.getUniqueTargetId());
-          this.mCommunicator.onVuforiaResult(trackable, result);
+            //raise result 2 vuforiaactivity over pipe/communicator
+            mLastTrackable = trackable;
+            mLastResult = result;
+            // this.mCommunicator.onVuforiaResult(trackable, result.getUniqueTargetId());
+            this.mCommunicator.onVuforiaResult(trackable, result);
+          }
+        }
+      } else if (statusCode == TargetFinder.UPDATE_NO_REQUEST) {
+        if (mLastTrackable != null && mLastResult != null) {
+          this.mCommunicator.onVuforiaResult(mLastTrackable, mLastResult);
         }
       }
-    }  else if (statusCode == TargetFinder.UPDATE_NO_REQUEST) {
 
-      if(mLastTrackable!=null && mLastResult!=null)
-      {
-        this.mCommunicator.onVuforiaResult(mLastTrackable, mLastResult);
-      }
-    }
   }
 
   @Override public void onVuforiaResumed() {

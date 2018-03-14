@@ -44,9 +44,13 @@ public class VuforiaActivity extends FragmentActivity implements ICloudRecogniti
     initGetCodeForResult(getIntent());
   }
 
+  @Override protected void onPause() {
+    super.onPause();
+    finish();
+  }
+
   private void initGetCodeForResult(Intent intent) {
-    int codeResultAux =
-        intent.getIntExtra(Constants.IMAGE_RECOGNITION_CODE_RESULT, -1);
+    int codeResultAux = intent.getIntExtra(Constants.IMAGE_RECOGNITION_CODE_RESULT, -1);
     if (codeResultAux != -1) {
       this.mCodeResult = codeResultAux;
     }
@@ -54,8 +58,7 @@ public class VuforiaActivity extends FragmentActivity implements ICloudRecogniti
 
   //region implements CloudRecoCommunicator ands initializations calls
   private void initVuforiaKeys(Intent intent) {
-    Bundle b = intent.getBundleExtra(
-        Constants.IMAGE_RECOGNITION_CREDENTIALS);
+    Bundle b = intent.getBundleExtra(Constants.IMAGE_RECOGNITION_CREDENTIALS);
     VuforiaCredentials vuforiaCredentials =
         b.getParcelable(Constants.IMAGE_RECOGNITION_CREDENTIALS);
 
@@ -72,8 +75,7 @@ public class VuforiaActivity extends FragmentActivity implements ICloudRecogniti
     scanLine = view.findViewById(R.id.scan_line);
     RelativeLayout relativeLayout = (RelativeLayout) view.findViewById(R.id.layoutContentVuforiaGL);
     relativeLayout.addView(vuforiaView, 0);
-    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB)
-    {
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
       markFakeFeaturePoint = new MarkFakeFeaturePoint(this);
     }
     relativeLayout.addView(markFakeFeaturePoint);
@@ -125,41 +127,55 @@ public class VuforiaActivity extends FragmentActivity implements ICloudRecogniti
   }
 
   private void scanlineStart() {
-    this.runOnUiThread(new Runnable() {
-      @Override public void run() {
-        scanLine.setVisibility(View.VISIBLE);
-        scanLine.setAnimation(scanAnimation);
-      }
-    });
+    if (scanLine != null) {
+      this.runOnUiThread(new Runnable() {
+        @Override public void run() {
+          scanLine.setVisibility(View.VISIBLE);
+          scanLine.setAnimation(scanAnimation);
+          if (markFakeFeaturePoint != null) markFakeFeaturePoint.setVisibility(View.VISIBLE);
+        }
+      });
+    }
   }
 
   private void scanlineStop() {
-    this.runOnUiThread(new Runnable() {
-      @Override public void run() {
-        scanLine.setVisibility(View.GONE);
-        scanLine.clearAnimation();
-      }
-    });
+    if (scanLine != null) {
+      this.runOnUiThread(new Runnable() {
+        @Override public void run() {
+          scanLine.setVisibility(View.GONE);
+          scanLine.clearAnimation();
+          if (markFakeFeaturePoint != null) markFakeFeaturePoint.setVisibility(View.GONE);
+        }
+      });
+    }
   }
+
   //endregion
 
   @Override public void onVuforiaResult(Trackable trackable, TargetSearchResult result) {
     scanlineStop();
-    //asv esto ahora peta, cruje la app, hay q ver el puto kotlin sendRecognizedPatternToClient(result);
+    //asv esto ahora peta, cruje la app, hay q ver el puto kotlin,es despues del cambio de los permisos y el paso a kotlin
+    //las funciones no están donde deberían
+    //ver como estaba esto aqui https://github.com/GigigoGreenLabs/imgRecogModule/blob/master/imagerecognition.vuforia/src/main/java/com/gigigo/imagerecognition/vuforia/ImageRecognitionVuforia.java
+    // sendRecognizedPatternToClient(result);
+
+    //todo aparte el modulo de permission sobra, no deberia ser cuestion de este sdk preguntar por los permisos
+    //y mucho menos llevar los permisos aki reimplementados de nuevo
+   // finish();
   }
 
   private void sendRecognizedPatternToClient(TargetSearchResult result) {
     Intent i = setDataIntent(result);
     //or start4result, and setresult, or callback by the broadcast
     if (mCodeResult != -1) {
-    //  setResult(Activity.RESULT_OK, i);
-     // finish();
+      //setResult(Activity.RESULT_OK, i);
+      // finish();
     } else {
       //we add package appid,
       String appId = getApplicationContext().getPackageName();
       i.putExtra(appId, appId);
       ImageRecognitionVuforia.Companion.sendRecognizedPattern(i);
-     // finish();
+      // finish();
     }
   }
 

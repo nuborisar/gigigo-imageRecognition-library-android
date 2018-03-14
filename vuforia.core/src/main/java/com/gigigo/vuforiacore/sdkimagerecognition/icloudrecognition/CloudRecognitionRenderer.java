@@ -23,7 +23,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 public class CloudRecognitionRenderer implements GLSurfaceView.Renderer, SampleAppRendererControl {
-  private static final float OBJECT_SCALE_FLOAT = 0.003f;//0.003f
+  private static final float OBJECT_SCALE_FLOAT = 0.005f;//0.003f
 
   private VuforiaSession vuforiaAppSession;
   private SampleAppRenderer mSampleAppRenderer;
@@ -257,7 +257,7 @@ public class CloudRecognitionRenderer implements GLSurfaceView.Renderer, SampleA
     mTextures = textures;
   }
 
-   public void renderFrame(State state, float[] projectionMatrix) {
+  public void renderFrame(State state, float[] projectionMatrix) {
     // Renders video background replacing Renderer.DrawVideoBackground()
     mSampleAppRenderer.renderVideoBackground();
 
@@ -272,10 +272,13 @@ public class CloudRecognitionRenderer implements GLSurfaceView.Renderer, SampleA
         return;
       }
       mCloudReco.stopFinderIfStarted();
-      System.out.println("*******************RENDER  1"+trackableResult.toString() +"projection:"+projectionMatrix.toString());
+      System.out.println("*******************RENDER  1"
+          + trackableResult.toString()
+          + "projection:"
+          + projectionMatrix.toString());
       // Renders the Augmentation View with the 3D Book data Panel
-      renderAugmentation(trackableResult, projectionMatrix);
 
+      renderAugmentation(trackableResult, projectionMatrix);
     } else {
       mCloudReco.startFinderIfStopped();
       System.out.println("*******************RENDER  2");

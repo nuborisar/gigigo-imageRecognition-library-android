@@ -2,8 +2,6 @@ package com.gigigo.imagerecognition.vuforia
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.view.View
 import android.widget.Toast
 import com.gigigo.imagerecognition.Constants
 import com.gigigo.imagerecognition.Credentials
@@ -11,6 +9,11 @@ import com.gigigo.imagerecognition.ImageRecognition
 import com.gigigo.imagerecognition.vuforia.credentials.VuforiaCredentials
 import com.gigigo.permissions.PermissionsActivity
 import com.gigigo.permissions.exception.Error as PermissionError
+
+
+//asv TODO esto es un mierdon de kilo, no hace las cosas como funcionaban antes, se ha transladado de esta clase el
+//sendpattern y el callback funciona de ojete
+
 
 /**
  * This is a suitable implementation for image recognition module, in fact this this Vuforia
@@ -92,3 +95,5 @@ class ImageRecognitionVuforia : ImageRecognition<ContextProvider> {
     }
   }
 }
+
+

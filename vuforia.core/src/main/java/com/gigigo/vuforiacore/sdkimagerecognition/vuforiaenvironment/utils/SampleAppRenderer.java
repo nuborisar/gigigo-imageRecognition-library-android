@@ -10,7 +10,6 @@ countries.
 package com.gigigo.vuforiacore.sdkimagerecognition.vuforiaenvironment.utils;
 
 import android.app.Activity;
-import android.content.res.Configuration;
 import android.graphics.Point;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
@@ -372,22 +371,23 @@ public class SampleAppRenderer {
     // Stores the orientation depending on the current resources configuration
     private void updateActivityOrientation()
     {
-        Configuration config = mActivity.getResources().getConfiguration();
-
-        switch (config.orientation)
-        {
-            case Configuration.ORIENTATION_PORTRAIT:
-                mIsPortrait = true;
-                break;
-            case Configuration.ORIENTATION_LANDSCAPE:
-                mIsPortrait = false;
-                break;
-            case Configuration.ORIENTATION_UNDEFINED:
-            default:
-                break;
-        }
-
-        Log.i(LOGTAG, "Activity is in "
-                + (mIsPortrait ? "PORTRAIT" : "LANDSCAPE"));
+        mIsPortrait = true;
+        //Configuration config = mActivity.getResources().getConfiguration();
+        //
+        //switch (config.orientation)
+        //{
+        //    case Configuration.ORIENTATION_PORTRAIT:
+        //        mIsPortrait = true;
+        //        break;
+        //    case Configuration.ORIENTATION_LANDSCAPE:
+        //        mIsPortrait = false;
+        //        break;
+        //    case Configuration.ORIENTATION_UNDEFINED:
+        //    default:
+        //        break;
+        //}
+        //
+        //Log.i(LOGTAG, "Activity is in "
+        //        + (mIsPortrait ? "PORTRAIT" : "LANDSCAPE"));
     }
 }
