@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
 import com.gigigo.imagerecognition.vuforia.ContextProvider
 import com.gigigo.imagerecognition.vuforia.ImageRecognitionVuforia
 
@@ -80,8 +79,10 @@ class ImageRecognizerActivity : AppCompatActivity() {
 
   private fun showResponseCode(code: String) {
     try {
-      Toast.makeText(this, "CODE= $code", Toast.LENGTH_LONG).show()
+      //Toast.makeText(this, "CODE= $code", Toast.LENGTH_LONG).show()
        //codeTv.text = "CODE= $code"
+
+      System.out.println("\\n\\n+++++++++++++++++++++++++++++"+code.toString());
     } catch (th: Throwable ) {
       System.out.println(th.toString());
     }

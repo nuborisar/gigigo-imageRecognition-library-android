@@ -86,8 +86,10 @@ public class CloudRecognition implements ApplicationControl {
   // The textures we will use for rendering:
   private Vector<Texture> mTextures;
 
+  ICloudRecognitionAR mCloudAR;
+
   public CloudRecognition(Activity activity, ICloudRecognitionCommunicator communicator,
-      String kAccessKey, String kSecretKey, String kLicenseKey, boolean showErrorMessages) {
+      String kAccessKey, String kSecretKey, String kLicenseKey, boolean showErrorMessages,ICloudRecognitionAR cloudAR) {
     this.mActivity = activity;
     this.mCommunicator = communicator;
     loadingDialogHandler = new LoadingDialogHandler(this.mActivity);
@@ -97,6 +99,7 @@ public class CloudRecognition implements ApplicationControl {
     this.mLicenseKey = kLicenseKey;
 
     this.bShowErrorMessages = showErrorMessages;
+    this.mCloudAR=cloudAR;
   }
 
   //region methods 4 Focus
@@ -254,7 +257,7 @@ public class CloudRecognition implements ApplicationControl {
     mGlView.init(translucent, depthSize, stencilSize);
 
     // Setups the Renderer of the GLView
-    mRenderer = new CloudRecognitionRenderer(vuforiaAppSession, this);
+    mRenderer = new CloudRecognitionRenderer(vuforiaAppSession, this,mCloudAR);
     mRenderer.setTextures(mTextures);
     mGlView.setRenderer(mRenderer);
   }

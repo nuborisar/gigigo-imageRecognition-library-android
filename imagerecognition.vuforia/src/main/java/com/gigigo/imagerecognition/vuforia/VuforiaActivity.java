@@ -35,6 +35,7 @@ public class VuforiaActivity extends FragmentActivity implements ICloudRecogniti
   //region New not GPU animation
   MarkFakeFeaturePoint markFakeFeaturePoint;
   private View scanLine;
+
   private TranslateAnimation scanAnimation;
 
   @Override protected void onCreate(Bundle state) {
@@ -64,7 +65,7 @@ public class VuforiaActivity extends FragmentActivity implements ICloudRecogniti
 
     mCloudRecoCallBack = new CloudRecognitionActivityLifeCycleCallBack(this, this,
         vuforiaCredentials.getClientAccessKey(), vuforiaCredentials.getClientSecretKey(),
-        vuforiaCredentials.getLicenseKey(), false);
+        vuforiaCredentials.getLicenseKey(), false, new CloudRecoARTeapotBLUEImpl());
   }
 
   @Override public void setContentViewTop(View vuforiaView) {
@@ -157,11 +158,13 @@ public class VuforiaActivity extends FragmentActivity implements ICloudRecogniti
     //asv esto ahora peta, cruje la app, hay q ver el puto kotlin,es despues del cambio de los permisos y el paso a kotlin
     //las funciones no están donde deberían
     //ver como estaba esto aqui https://github.com/GigigoGreenLabs/imgRecogModule/blob/master/imagerecognition.vuforia/src/main/java/com/gigigo/imagerecognition/vuforia/ImageRecognitionVuforia.java
-    // sendRecognizedPatternToClient(result);
-
+    //   sendRecognizedPatternToClient(result);
+    //System.out.println("##############################\n\n"
+    //    + result.getTargetName()
+    //    + "\n\n##############################\n\n");
     //todo aparte el modulo de permission sobra, no deberia ser cuestion de este sdk preguntar por los permisos
     //y mucho menos llevar los permisos aki reimplementados de nuevo
-   // finish();
+    // finish();
   }
 
   private void sendRecognizedPatternToClient(TargetSearchResult result) {
