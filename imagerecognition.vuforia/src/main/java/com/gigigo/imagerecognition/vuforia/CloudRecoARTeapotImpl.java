@@ -115,4 +115,14 @@ public class CloudRecoARTeapotImpl implements ICloudRecognitionAR {
 
     SampleUtils.checkGLError("CloudReco renderFrame");
   }
+
+  public volatile float mAngle = -1;
+
+  @Override public void setAngleRotation(float angleRotation) {
+    mAngle = angleRotation;
+  }
+
+  @Override public float getAngleRotation() {
+    return mAngle;
+  }
 }

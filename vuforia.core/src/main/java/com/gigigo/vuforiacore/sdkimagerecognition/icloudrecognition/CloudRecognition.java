@@ -7,6 +7,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
@@ -88,6 +89,12 @@ public class CloudRecognition implements ApplicationControl {
 
   ICloudRecognitionAR mCloudAR;
 
+
+  private final float TOUCH_SCALE_FACTOR = 180.0f / 320;
+  private float mPreviousX;
+  private float mPreviousY;
+
+
   public CloudRecognition(Activity activity, ICloudRecognitionCommunicator communicator,
       String kAccessKey, String kSecretKey, String kLicenseKey, boolean showErrorMessages,ICloudRecognitionAR cloudAR) {
     this.mActivity = activity;
@@ -100,11 +107,25 @@ public class CloudRecognition implements ApplicationControl {
 
     this.bShowErrorMessages = showErrorMessages;
     this.mCloudAR=cloudAR;
+
   }
 
+
   //region methods 4 Focus
-  public boolean on_TouchEvent(MotionEvent event) {
-    return mGestureDetector.onTouchEvent(event);
+  private int getHeight(){
+    return 1920;
+  }
+  private int getWidth(){
+    return 1080;
+  }
+  public boolean on_TouchEvent(MotionEvent e) {
+    return mGestureDetector.onTouchEvent(e);
+
+    // MotionEvent reports input details from the touch screen
+    // and other input controls. In this case, you are only
+    // interested in events where the touch position changed.
+//region d
+
   }
   //endregion
 
@@ -255,11 +276,48 @@ public class CloudRecognition implements ApplicationControl {
     // Initialize the GLView with proper flags
     mGlView = new VuforiaGLView(this.mActivity);
     mGlView.init(translucent, depthSize, stencilSize);
+ /*asvtest*/
 
+    //asv todo el gesturedetector q lo crea el a lo gincher, habría que pasarselo desde fuera
+    this.mGlView.setOnTouchListener(new View.OnTouchListener() {
+      @Override public boolean onTouch(View v, MotionEvent e) {
+        float x = e.getX();
+        float y = e.getY();
+
+        switch (e.getAction()) {
+          case MotionEvent.ACTION_MOVE:
+
+            float dx = x - mPreviousX;
+            float dy = y - mPreviousY;
+
+            // reverse direction of rotation above the mid-line
+            if (y > getHeight() / 2) {
+              dx = dx * -1 ;
+            }
+
+            // reverse direction of rotation to left of the mid-line
+            if (x < getWidth() / 2) {
+              dy = dy * -1 ;
+            }
+
+            //asv este en vez del renderer deberia ser el IcloudRecognitionAR
+
+            mRenderer.setAngle(
+                mRenderer.getAngle() +
+                    ((dx + dy) * TOUCH_SCALE_FACTOR));
+            mGlView.requestRender();
+        }
+
+        mPreviousX = x;
+        mPreviousY = y;
+        return true;
+      }
+    });
     // Setups the Renderer of the GLView
     mRenderer = new CloudRecognitionRenderer(vuforiaAppSession, this,mCloudAR);
     mRenderer.setTextures(mTextures);
     mGlView.setRenderer(mRenderer);
+    mGlView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);//asv todo esto es para la rotation, si peta o tal quitarlo
   }
 
   //region retrieve Error Message

@@ -34,7 +34,6 @@ public class CloudRecoARTeapotBLUEImpl implements ICloudRecognitionAR {
 
   private static final float OBJECT_SCALE_FLOAT = 0.005f;//0.003f
 
-
   private void loadTextures() {
     mTextures.add(Texture.loadTextureFromApk("TextureTeapotBlue.png", mActivity.getAssets()));
   }
@@ -114,5 +113,15 @@ public class CloudRecoARTeapotBLUEImpl implements ICloudRecognitionAR {
     GLES20.glDisableVertexAttribArray(textureCoordHandle);
 
     SampleUtils.checkGLError("CloudReco renderFrame");
+  }
+
+  public volatile float mAngle = -1;
+
+  @Override public void setAngleRotation(float angleRotation) {
+    mAngle = angleRotation;
+  }
+
+  @Override public float getAngleRotation() {
+    return mAngle;
   }
 }

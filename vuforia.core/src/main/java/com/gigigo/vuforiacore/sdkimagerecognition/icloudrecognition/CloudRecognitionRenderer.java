@@ -18,7 +18,6 @@ import javax.microedition.khronos.opengles.GL10;
 //asv todo hay q limpiar todo lo q tiene q ver con las texturas y tal, aparte el tema de las textura está tan raro x el tema del contexto
 //necesariopara acceder a los resources, completamente trivial ya q se puede hacer antes y darle el textures
 
-
 //revisar esta renderer https://stackoverflow.com/questions/41460581/android-vuforia-multi-target-rotate-object-on-touch
 //y crear nuestro multirenderer para cambiar el mismo en caliente, en plan empezarconun cloudReco q una vez encuentre un
 //resultado lo fije mediante el ground plane ese de fijar en un punto de la realidad, o pasar de cloudreco a un localrecog
@@ -42,6 +41,24 @@ public class CloudRecognitionRenderer implements GLSurfaceView.Renderer, SampleA
 
   private boolean mIsActive = false;
   private ICloudRecognitionAR mCloudRecognitionAR;
+
+  //asv rotation ini, gitanada extreme ¬¬
+
+  public float getAngle() {
+    if (mCloudRecognitionAR != null) {
+      return mCloudRecognitionAR.getAngleRotation();
+    } else
+
+    {
+      return -1;
+    }
+  }
+
+  public void setAngle(float angle) {
+    if (mCloudRecognitionAR != null) mCloudRecognitionAR.setAngleRotation(angle);
+  }
+
+  //asv rotation fin
 
   public CloudRecognitionRenderer(VuforiaSession session, CloudRecognition cloudRecog,
       ICloudRecognitionAR cloudRecognitionAR) {
@@ -76,9 +93,11 @@ public class CloudRecognitionRenderer implements GLSurfaceView.Renderer, SampleA
   // Called to draw the current frame.
   @Override public void onDrawFrame(GL10 gl) {
     if (!mIsActive) //asv test this
+    {
       return;
+    }
     // Call our function to render content
-    mSampleAppRenderer.render();
+    mSampleAppRenderer.render(); //asv rotation añado el parametro del angulo al renderer(es el cludrendere q a su vez se lo pasa al renderBase y este applica el angulo en el evento de onDrawGl
   }
 
   public void setActive(boolean active) {
@@ -138,6 +157,7 @@ public class CloudRecognitionRenderer implements GLSurfaceView.Renderer, SampleA
       if (trackableResult == null) {
         return;
       }
+
       mCloudReco.stopFinderIfStarted();
       System.out.println("*******************RENDER  1"
           + trackableResult.toString()
@@ -157,7 +177,7 @@ public class CloudRecognitionRenderer implements GLSurfaceView.Renderer, SampleA
   }
 
   private void renderAugmentation(TrackableResult trackableResult, float[] projectionMatrix) {
-    mCloudRecognitionAR.onRenderAR(trackableResult,projectionMatrix);
+    mCloudRecognitionAR.onRenderAR(trackableResult, projectionMatrix);
    /* System.out.println("*******************RENDER AR");
     //asv check this
     //https://library.vuforia.com/content/vuforia-library/en/articles/Solution/Working-with-Vuforia-and-OpenGL-ES.html#How-To-Render-Static-3D-Models-using-OpenGL-ES

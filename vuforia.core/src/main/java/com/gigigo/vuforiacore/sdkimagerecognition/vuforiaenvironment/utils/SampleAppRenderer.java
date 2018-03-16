@@ -210,7 +210,79 @@ public class SampleAppRenderer {
 
         mRenderer.end();
     }
+//asv creo q para pintar el rotado de la teapot en AR debe ser en aplicar la transform en el IcloudRecogARimplementation, no aki*/
+    /*public void render(float angle)
+    {
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+        State state;
+        // Get our current state
+        state = TrackerManager.getInstance().getStateUpdater().updateState();
+        mRenderer.begin(state);
 
+        // We must detect if background reflection is active and adjust the
+        // culling direction.
+        // If the reflection is active, this means the post matrix has been
+        // reflected as well,
+        // therefore standard counter clockwise face culling will result in
+        // "inside out" models.
+        if (Renderer.getInstance().getVideoBackgroundConfig().getReflection() == VIDEO_BACKGROUND_REFLECTION.VIDEO_BACKGROUND_REFLECTION_ON)
+            GLES20.glFrontFace(GLES20.GL_CW);  // Front camera
+        else
+            GLES20.glFrontFace(GLES20.GL_CCW);   // Back camera
+
+        // We get a list of views which depend on the mode we are working on, for mono we have
+        // only one view, in stereo we have three: left, right and postprocess
+        ViewList viewList = mRenderingPrimitives.getRenderingViews();
+
+        // Cycle through the view list
+        for (int v = 0; v < viewList.getNumViews(); v++)
+        {
+            // Get the view id
+            int viewID = viewList.getView(v);
+
+            Vec4I viewport;
+            // Get the viewport for that specific view
+            viewport = mRenderingPrimitives.getViewport(viewID);
+
+            // Set viewport for current view
+            GLES20.glViewport(viewport.getData()[0], viewport.getData()[1], viewport.getData()[2], viewport.getData()[3]);
+
+            // Set scissor
+            GLES20.glScissor(viewport.getData()[0], viewport.getData()[1], viewport.getData()[2], viewport.getData()[3]);
+
+            // Get projection matrix for the current view. COORDINATE_SYSTEM_CAMERA used for AR and
+            // COORDINATE_SYSTEM_WORLD for VR
+            Matrix34F
+                projMatrix = mRenderingPrimitives.getProjectionMatrix(viewID, COORDINATE_SYSTEM_TYPE.COORDINATE_SYSTEM_CAMERA,
+                state.getCameraCalibration());
+
+            // Create GL matrix setting up the near and far planes
+            float rawProjectionMatrixGL[] = Tool.convertPerspectiveProjection2GLMatrix(
+                projMatrix,
+                mNearPlane,
+                mFarPlane)
+                .getData();
+
+            // Apply the appropriate eye adjustment to the raw projection matrix, and assign to the global variable
+            float eyeAdjustmentGL[] = Tool.convert2GLMatrix(mRenderingPrimitives
+                .getEyeDisplayAdjustmentMatrix(viewID)).getData();
+
+            float projectionMatrix[] = new float[16];
+            // Apply the adjustment to the projection matrix
+            Matrix.multiplyMM(projectionMatrix, 0, rawProjectionMatrixGL, 0, eyeAdjustmentGL, 0);
+
+            currentView = viewID;
+
+            // Call renderFrame from the app renderer class which implements SampleAppRendererControl
+            // This will be called for MONO, LEFT and RIGHT views, POSTPROCESS will not render the
+            // frame
+            if(currentView != VIEW.VIEW_POSTPROCESS)
+                mRenderingInterface.renderFrame(state, projectionMatrix);
+        }
+
+        mRenderer.end();
+    }
+*/
     public void setNearFarPlanes(float near, float far)
     {
         mNearPlane = near;
