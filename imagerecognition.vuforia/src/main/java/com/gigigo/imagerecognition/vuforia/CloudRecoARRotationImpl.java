@@ -163,7 +163,7 @@ public class CloudRecoARRotationImpl implements ICloudRecognitionAR {
       // Remove the following line to make the bowl stop spinning:
       // animateBowl(modelViewMatrix);
 
-       Matrix.translateM(modelViewMatrix, 0, 0, -0.27f , 0);
+       Matrix.translateM(modelViewMatrix, 0, 0, -0.27f , 0); //asv esto es para pintarlo justo centrado y q coincida con la boca de la tetera
       // Matrix.translateM(modelViewMatrix, 0, -0.50f  * 0.12f*3, -0.50f*0.02f  , 0.00135f * 0.12f);
       Matrix.scaleM(modelViewMatrix, 0, kBowlScaleX, kBowlScaleY, kBowlScaleZ);
       Matrix.multiplyMM(modelViewProjection, 0, projectionMatrix, 0, modelViewMatrix, 0);
